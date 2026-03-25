@@ -1,0 +1,3780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>REINA v12.1 – Quick Mode</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0e7490;
+            --primary-dark: #0a5a6e;
+            --primary-light: #67e8f9;
+            --primary-wash: #ecfeff;
+            --accent: #6366f1;
+            --accent-wash: #eef2ff;
+            --success: #059669;
+            --success-wash: #ecfdf5;
+            --warning: #d97706;
+            --warning-wash: #fffbeb;
+            --danger: #dc2626;
+            --danger-wash: #fef2f2;
+            --bg: #f1f5f9;
+            --card: #ffffff;
+            --text: #0f172a;
+            --text-mid: #475569;
+            --text-light: #94a3b8;
+            --border: #e2e8f0;
+            --border-light: #f1f5f9;
+            --radius: 14px;
+            --radius-sm: 8px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.06), 0 2px 4px rgba(0,0,0,0.04);
+            --shadow-lg: 0 12px 32px rgba(0,0,0,0.08), 0 4px 8px rgba(0,0,0,0.04);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* — LAYOUT — */
+        .app {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 24px 20px 80px;
+        }
+
+        /* — HEADER — */
+        .header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .header-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 16px;
+        }
+
+        .header-badge .dot {
+            width: 6px;
+            height: 6px;
+            background: var(--primary-light);
+            border-radius: 50%;
+            animation: blink 2s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text);
+            letter-spacing: -0.5px;
+            margin-bottom: 6px;
+        }
+
+        .header p {
+            color: var(--text-mid);
+            font-size: 15px;
+            max-width: 520px;
+            margin: 0 auto;
+        }
+
+        /* — PROGRESS — */
+        .progress-bar {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            margin-bottom: 32px;
+            padding: 0 8px;
+        }
+
+        .progress-step {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .progress-step .num {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 600;
+            background: var(--border);
+            color: var(--text-light);
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+
+        .progress-step.active .num {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 0 0 4px rgba(14, 116, 144, 0.15);
+        }
+
+        .progress-step.done .num {
+            background: var(--success);
+            color: white;
+        }
+
+        .progress-step .label {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-light);
+            white-space: nowrap;
+            transition: all 0.3s;
+        }
+
+        .progress-step.active .label {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .progress-step.done .label {
+            color: var(--success);
+        }
+
+        .progress-line {
+            flex: 1;
+            height: 2px;
+            background: var(--border);
+            margin: 0 6px;
+            transition: background 0.3s;
+        }
+
+        .progress-line.done {
+            background: var(--success);
+        }
+
+        /* — STEP PANELS — */
+        .step-panel {
+            display: none;
+            animation: fadeUp 0.35s ease;
+        }
+
+        .step-panel.active {
+            display: block;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .step-question {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 6px;
+            letter-spacing: -0.3px;
+        }
+
+        .step-subtitle {
+            font-size: 14px;
+            color: var(--text-mid);
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        /* — CHOICE CARDS — */
+        .choice-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .choice-grid.single-col {
+            grid-template-columns: 1fr;
+        }
+
+        .choice-grid.triple {
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+
+        .choice-card {
+            background: var(--card);
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px 18px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .choice-card:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow-sm);
+            transform: translateY(-1px);
+        }
+
+        .choice-card.selected {
+            border-color: var(--primary);
+            background: var(--primary-wash);
+            box-shadow: 0 0 0 3px rgba(14, 116, 144, 0.12);
+        }
+
+        .choice-card.urgent {
+            border-left: 4px solid var(--danger);
+        }
+
+        .choice-card.smart-default {
+            border: 2px solid var(--primary);
+            background: linear-gradient(135deg, #ecfeff 0%, #e0f2fe 100%);
+            grid-column: 1 / -1;
+        }
+
+        .choice-card.smart-default .title {
+            font-size: 15px;
+            color: var(--primary-dark);
+        }
+
+        .choice-card.smart-default .desc {
+            color: var(--primary-dark);
+            opacity: 0.8;
+        }
+
+        .choice-card.smart-default.selected {
+            background: linear-gradient(135deg, #cffafe 0%, #bae6fd 100%);
+            border-color: var(--primary-dark);
+            box-shadow: 0 0 0 3px rgba(14, 116, 144, 0.18);
+        }
+
+        .choice-card.smart-default .smart-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .choice-card.smart-default .smart-tag {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 10px;
+            background: rgba(14, 116, 144, 0.1);
+            color: var(--primary-dark);
+            letter-spacing: 0.3px;
+        }
+
+        .choice-card.urgent.selected {
+            background: var(--danger-wash);
+            border-color: var(--danger);
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+        }
+
+        .choice-card .icon {
+            font-size: 22px;
+            margin-bottom: 8px;
+        }
+
+        .choice-card .title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+
+        .choice-card .desc {
+            font-size: 12px;
+            color: var(--text-mid);
+            line-height: 1.4;
+        }
+
+        .choice-card .check {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            border: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: transparent;
+            transition: all 0.2s;
+        }
+
+        .choice-card.selected .check {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        .choice-card.urgent.selected .check {
+            background: var(--danger);
+            border-color: var(--danger);
+        }
+
+        /* — SECTION DIVIDER — */
+        .section-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--text-light);
+            margin: 24px 0 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-label::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        /* — WEIGHT SELECTOR — */
+        .weight-selector {
+            display: flex;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .weight-option {
+            flex: 1;
+            background: var(--card);
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .weight-option:hover {
+            border-color: var(--primary);
+        }
+
+        .weight-option.selected {
+            border-color: var(--primary);
+            background: var(--primary-wash);
+            box-shadow: 0 0 0 3px rgba(14, 116, 144, 0.12);
+        }
+
+        .weight-option .range {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .weight-option .unit {
+            font-size: 12px;
+            color: var(--text-light);
+            margin-top: 4px;
+        }
+
+        .weight-exact {
+            margin-top: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .weight-exact label {
+            font-size: 13px;
+            color: var(--text-mid);
+            white-space: nowrap;
+        }
+
+        .weight-exact input {
+            width: 100px;
+            padding: 8px 12px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            text-align: center;
+            outline: none;
+            transition: border 0.2s;
+        }
+
+        .weight-exact input:focus {
+            border-color: var(--primary);
+        }
+
+        .weight-exact .suffix {
+            font-size: 13px;
+            color: var(--text-light);
+        }
+
+        /* — NAV BUTTONS — */
+        .nav-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 32px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 22px;
+            border-radius: var(--radius-sm);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .btn-back {
+            background: transparent;
+            color: var(--text-mid);
+        }
+
+        .btn-back:hover {
+            color: var(--text);
+            background: var(--border-light);
+        }
+
+        .btn-next {
+            background: var(--primary);
+            color: white;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-next:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-next:disabled {
+            background: var(--border);
+            color: var(--text-light);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-generate {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            padding: 12px 28px;
+            font-size: 15px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-generate:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .selection-count {
+            font-size: 12px;
+            color: var(--text-light);
+        }
+
+        /* — OUTPUT PANEL — */
+        .output-panel {
+            display: none;
+            animation: fadeUp 0.4s ease;
+        }
+
+        .output-panel.active {
+            display: block;
+        }
+
+        .rx-card {
+            background: var(--card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .rx-header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 20px 24px;
+        }
+
+        .rx-header h2 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .rx-header .subtitle {
+            font-size: 13px;
+            opacity: 0.85;
+        }
+
+        .rx-body {
+            padding: 24px;
+        }
+
+        /* — SETTINGS GRID (from dosing_adjustment.html) — */
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 10px;
+        }
+
+        .setting-item {
+            background: var(--bg);
+            padding: 12px;
+            border-radius: var(--radius-sm);
+            text-align: center;
+            border: 1px solid var(--border-light);
+        }
+
+        .setting-label {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            margin-bottom: 4px;
+        }
+
+        .setting-value {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--primary);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .setting-unit {
+            font-size: 10px;
+            font-weight: normal;
+            color: var(--text-light);
+        }
+
+        .setting-why {
+            font-size: 9px;
+            color: var(--success);
+            margin-top: 3px;
+            font-style: italic;
+            line-height: 1.3;
+        }
+
+        .setting-item.span-2 {
+            grid-column: span 2;
+        }
+
+        /* — PROTOCOL NOTE — */
+        .protocol-note {
+            margin-top: 12px;
+            padding: 10px 14px;
+            background: #f0f9ff;
+            border-radius: var(--radius-sm);
+            font-size: 11px;
+            color: #0369a1;
+            border-left: 3px solid #0ea5e9;
+            line-height: 1.5;
+        }
+
+        /* — CITRATE SECTION — */
+        .citrate-section {
+            background: var(--card);
+            border: 1px solid #fde68a;
+            border-left: 4px solid var(--warning);
+            border-radius: var(--radius-sm);
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .citrate-section h3 {
+            font-size: 14px;
+            font-weight: 700;
+            color: #92400e;
+            margin-bottom: 10px;
+        }
+
+        .citrate-section .detail {
+            font-size: 12px;
+            color: var(--text-mid);
+            line-height: 1.6;
+        }
+
+        /* — PROTOCOL TABLE — */
+        .protocol-table-section {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px 20px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .protocol-table-section h3 {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+
+        .protocol-table-section .table-note {
+            font-size: 10px;
+            color: var(--text-light);
+            margin-bottom: 10px;
+        }
+
+        .protocol-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+
+        .protocol-table th,
+        .protocol-table td {
+            padding: 8px 10px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .protocol-table th {
+            background: var(--bg);
+            font-weight: 600;
+            font-size: 11px;
+            color: var(--text-mid);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .protocol-table th.header-row {
+            background: var(--primary-wash);
+            color: var(--primary);
+            text-transform: none;
+            font-size: 12px;
+        }
+
+        .protocol-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .protocol-table td.active-weight {
+            background: var(--primary-wash);
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        /* — DOSE TRANSPARENCY — */
+        .dose-section {
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+            border: 2px solid #10b981;
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        .dose-section h3 {
+            font-size: 14px;
+            font-weight: 700;
+            color: #065f46;
+            margin-bottom: 12px;
+        }
+
+        .dose-transparency-box {
+            background: white;
+            border-radius: var(--radius-sm);
+            padding: 14px;
+            margin-bottom: 14px;
+        }
+
+        .dose-transparency-box .formula {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            padding: 10px;
+            background: #f8fafc;
+            border-radius: 6px;
+            margin: 8px 0;
+            color: var(--text);
+            border-left: 3px solid var(--primary);
+        }
+
+        .dose-transparency-box .explanation {
+            font-size: 11px;
+            color: var(--text-mid);
+            margin-top: 8px;
+            line-height: 1.5;
+        }
+
+        /* — DOSE LIVE CALC — */
+        .dose-live-calc {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 12px;
+            align-items: center;
+            background: white;
+            padding: 14px;
+            border-radius: var(--radius-sm);
+        }
+
+        .dose-live-box {
+            text-align: center;
+            padding: 8px;
+        }
+
+        .dose-live-label {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            margin-bottom: 4px;
+        }
+
+        .dose-live-value {
+            font-size: 24px;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .dose-live-value.prescribed { color: var(--primary); }
+        .dose-live-value.delivered { color: var(--success); }
+        .dose-live-value.delivered.warning-val { color: #f59e0b; }
+        .dose-live-value.delivered.danger-val { color: #ef4444; }
+
+        .dose-arrow {
+            font-size: 24px;
+            color: var(--text-light);
+        }
+
+        .dose-unit {
+            font-size: 10px;
+            font-weight: normal;
+        }
+
+        .dose-status-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+            margin-top: 6px;
+        }
+
+        .dose-status-badge.optimal {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .dose-status-badge.suboptimal {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .dose-status-badge.low {
+            background: #fecaca;
+            color: #991b1b;
+        }
+
+        /* — UF RECOMMENDATION — */
+        .uf-section {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px 20px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .uf-section h3 {
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .uf-section .detail {
+            font-size: 12px;
+            color: var(--text-mid);
+            line-height: 1.6;
+        }
+
+        .uf-section.conservative { border-left: 4px solid var(--danger); }
+        .uf-section.moderate { border-left: 4px solid var(--warning); }
+        .uf-section.liberal { border-left: 4px solid var(--success); }
+
+        /* — SEPSIS EVIDENCE — */
+        .sepsis-section {
+            background: linear-gradient(135deg, #faf5ff, #f3e8ff);
+            border: 2px solid #c4b5fd;
+            border-radius: var(--radius);
+            padding: 16px 20px;
+            margin-bottom: 16px;
+        }
+
+        .sepsis-section h3 {
+            font-size: 13px;
+            font-weight: 700;
+            color: #7c3aed;
+            margin-bottom: 8px;
+        }
+
+        .sepsis-section .detail {
+            font-size: 12px;
+            color: #6b21a8;
+            line-height: 1.6;
+        }
+
+        /* — EVIDENCE BOX — */
+        .evidence-box {
+            background: #dbeafe;
+            border-radius: var(--radius-sm);
+            padding: 14px 16px;
+            margin-bottom: 16px;
+            font-size: 12px;
+            color: #1e40af;
+            line-height: 1.6;
+        }
+
+        .evidence-box strong {
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        /* — CLINICAL PROMPTS — */
+        .clinical-prompts {
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            border-radius: var(--radius-sm);
+            padding: 14px 16px;
+            margin-bottom: 16px;
+        }
+
+        .clinical-prompts h4 {
+            font-size: 12px;
+            font-weight: 700;
+            color: #92400e;
+            margin-bottom: 8px;
+        }
+
+        .clinical-prompts ul {
+            margin: 0;
+            padding-left: 18px;
+            font-size: 11px;
+            color: #78350f;
+            line-height: 1.6;
+        }
+
+        .clinical-prompts li {
+            margin-bottom: 3px;
+        }
+
+        /* — EXISTING OUTPUT STYLES — */
+        .rx-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .rx-item {
+            padding: 14px 16px;
+            background: var(--bg);
+            border-radius: var(--radius-sm);
+            border-left: 3px solid var(--primary);
+        }
+
+        .rx-item.highlight {
+            border-left-color: var(--accent);
+            background: var(--accent-wash);
+        }
+
+        .rx-item.warning {
+            border-left-color: var(--warning);
+            background: var(--warning-wash);
+        }
+
+        .rx-item .rx-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-light);
+            margin-bottom: 4px;
+        }
+
+        .rx-item .rx-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .rx-item .rx-note {
+            font-size: 11px;
+            color: var(--text-mid);
+            margin-top: 4px;
+            line-height: 1.4;
+        }
+
+        .rx-full {
+            grid-column: 1 / -1;
+        }
+
+        /* Clinical reasoning card */
+        .reasoning-card {
+            background: var(--card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+
+        .reasoning-header {
+            padding: 14px 20px;
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .reasoning-body {
+            padding: 16px 20px;
+        }
+
+        .reasoning-item {
+            display: flex;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-light);
+            font-size: 13px;
+            color: var(--text-mid);
+            line-height: 1.5;
+        }
+
+        .reasoning-item:last-child {
+            border-bottom: none;
+        }
+
+        .reasoning-item .r-icon {
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .reasoning-item strong {
+            color: var(--text);
+        }
+
+        .evidence-pill {
+            display: inline-block;
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+            margin-left: 4px;
+        }
+
+        /* — SELECTIONS SUMMARY — */
+        .summary-strip {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 20px;
+        }
+
+        .summary-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: var(--primary-wash);
+            color: var(--primary);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .summary-tag.danger {
+            background: var(--danger-wash);
+            color: var(--danger);
+        }
+
+        .summary-tag.warning {
+            background: var(--warning-wash);
+            color: var(--warning);
+        }
+
+        /* — MODE TOGGLE — */
+        .mode-toggle {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 28px;
+        }
+
+        .mode-toggle-inner {
+            display: flex;
+            background: var(--card);
+            border-radius: 10px;
+            padding: 4px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+        }
+
+        .mode-btn {
+            padding: 8px 20px;
+            border-radius: 7px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            background: transparent;
+            color: var(--text-mid);
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .mode-btn.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* — COMPARISON STRIP — */
+        .comparison {
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: 20px 24px;
+            margin-top: 24px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+        }
+
+        .comparison h3 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--text);
+        }
+
+        .compare-row {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 16px;
+            align-items: start;
+        }
+
+        .compare-col {
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .compare-col h4 {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .compare-arrow {
+            font-size: 20px;
+            color: var(--primary);
+            padding-top: 24px;
+        }
+
+        .compare-col ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .compare-col li {
+            padding: 3px 0;
+            color: var(--text-mid);
+        }
+
+        .compare-col li::before {
+            content: '\2022';
+            color: var(--text-light);
+            margin-right: 8px;
+        }
+
+        .compare-col.new li::before {
+            content: '\2714';
+            color: var(--success);
+        }
+
+        /* — RESPONSIVE — */
+        @media (max-width: 640px) {
+            .choice-grid { grid-template-columns: 1fr; }
+            .choice-grid.triple { grid-template-columns: 1fr; }
+            .rx-grid { grid-template-columns: 1fr; }
+            .settings-grid { grid-template-columns: repeat(2, 1fr); }
+            .compare-row { grid-template-columns: 1fr; gap: 12px; }
+            .compare-arrow { display: none; }
+            .progress-step .label { display: none; }
+            .weight-selector { flex-direction: column; }
+            .dose-live-calc { grid-template-columns: 1fr; gap: 8px; }
+            .dose-arrow { transform: rotate(90deg); }
+        }
+
+        /* — WIREFRAME NOTICE — */
+        .wireframe-notice {
+            text-align: center;
+            padding: 10px;
+            background: #fef3c7;
+            color: #92400e;
+            font-size: 12px;
+            font-weight: 500;
+            border-bottom: 1px solid #fde68a;
+        }
+
+        /* — RESTART — */
+        .btn-restart {
+            background: var(--bg);
+            color: var(--text-mid);
+            border: 1px solid var(--border);
+            margin-top: 12px;
+        }
+
+        .btn-restart:hover {
+            background: var(--border-light);
+            border-color: var(--text-light);
+        }
+
+        /* — PROMPT CARD — */
+        .prompt-card {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            border-radius: var(--radius-sm);
+            padding: 12px 16px;
+            margin-top: 16px;
+            font-size: 12px;
+            color: #92400e;
+            line-height: 1.5;
+        }
+
+        .prompt-card strong {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* === 3-Tier Label System === */
+        .tier-badge { display:inline-flex; align-items:center; gap:4px; font-size:10px; font-weight:700; padding:2px 8px; border-radius:4px; letter-spacing:0.3px; text-transform:uppercase; }
+        .tier-badge.micu-protocol { background:#e0f2fe; color:#0369a1; border:1px solid #7dd3fc; }
+        .tier-badge.reina-upgrade { background:#fef3c7; color:#92400e; border:1px solid #fbbf24; }
+        .tier-badge.clinician-judgement { background:#f3e8ff; color:#6b21a8; border:1px solid #c084fc; }
+        .reina-upgrade-box { border-left:4px solid #f59e0b; background:linear-gradient(135deg,#fffbeb 0%,#fef3c7 100%); border-radius:8px; padding:16px; margin:10px 0; }
+        .reina-upgrade-box h4 { margin:0 0 8px 0; font-size:13px; color:#92400e; }
+        .micu-protocol-box { border-left:4px solid #0ea5e9; background:linear-gradient(135deg,#f0f9ff 0%,#e0f2fe 100%); border-radius:8px; padding:16px; margin:10px 0; }
+        .micu-protocol-box h4 { margin:0 0 8px 0; font-size:13px; color:#0369a1; }
+        .clinician-judgement-box { border-left:4px solid #a855f7; background:linear-gradient(135deg,#faf5ff 0%,#f3e8ff 100%); border-radius:8px; padding:16px; margin:10px 0; }
+        .clinician-judgement-box h4 { margin:0 0 8px 0; font-size:13px; color:#6b21a8; }
+        .evidence-toggle { font-size:11px; color:#92400e; cursor:pointer; text-decoration:underline; margin-top:6px; display:inline-block; }
+        .evidence-detail { display:none; font-size:11px; color:#78350f; background:rgba(245,158,11,0.08); padding:8px 12px; border-radius:4px; margin-top:6px; line-height:1.6; }
+        /* Ring 3: Inline evidence cards */
+        .evidence-inline { margin:8px 0 12px 0; }
+        .evidence-inline-toggle { font-size:11px; color:#0369a1; cursor:pointer; display:inline-flex; align-items:center; gap:4px; padding:4px 10px; background:#f0f9ff; border:1px solid #bae6fd; border-radius:4px; transition:background 0.15s; }
+        .evidence-inline-toggle:hover { background:#e0f2fe; }
+        .evidence-inline-body { display:none; margin-top:6px; border:1px solid #e2e8f0; border-radius:6px; overflow:hidden; }
+        .evidence-inline-body.open { display:block; }
+        .evi-row { display:grid; grid-template-columns:1fr auto; gap:4px; padding:8px 12px; font-size:11px; line-height:1.5; border-bottom:1px solid #f1f5f9; }
+        .evi-row:last-child { border-bottom:none; }
+        .evi-row:nth-child(odd) { background:#fafbfc; }
+        .evi-trial { font-weight:700; color:var(--text-dark); }
+        .evi-finding { color:var(--text-mid); }
+        .evi-implication { color:#0369a1; font-style:italic; font-size:10px; margin-top:2px; }
+        .grade-badge { display:inline-block; font-size:9px; font-weight:700; padding:1px 6px; border-radius:3px; letter-spacing:0.3px; text-transform:uppercase; vertical-align:middle; margin-left:4px; }
+        .grade-high { background:#d1fae5; color:#065f46; }
+        .grade-moderate { background:#dbeafe; color:#1e40af; }
+        .grade-low { background:#fef3c7; color:#92400e; }
+        .grade-verylow { background:#fee2e2; color:#991b1b; }
+    </style>
+</head>
+<body>
+
+<div class="wireframe-notice">
+    REINA v12 – Quick Mode Wireframe / Interactive Prototype (for clinician feedback)
+</div>
+
+<div class="app">
+
+    <!-- HEADER -->
+    <div class="header">
+        <div class="header-badge">
+            <span>REINA v12</span>
+            <span class="dot"></span>
+            <span>QUICK MODE</span>
+        </div>
+        <h1>Goal-Directed RRT Prescription</h1>
+        <p>5 clinical choices → personalised CRRT prescription. No data entry required.</p>
+    </div>
+
+    <!-- v14: Single-page cascade — no tabs, progressive reveal -->
+    <style>
+        .section-label { font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 0.5px; text-transform: uppercase; margin: 18px 0 10px; }
+        .section-label:first-child { margin-top: 0; }
+        .implied-tag { display: inline-block; font-size: 10px; padding: 1px 6px; border-radius: 8px; background: #fef3c7; color: #92400e; margin-left: 6px; font-weight: 500; }
+        .sub-reveal { max-height: 0; overflow: hidden; transition: max-height 0.35s ease, opacity 0.3s ease; opacity: 0; }
+        .sub-reveal.open { max-height: 500px; opacity: 1; }
+        .choice-card.urgent { border-color: #fca5a5; }
+        .choice-card.urgent.selected { background: #fef2f2; border-color: #dc2626; }
+        .choice-card.urgent.selected .title { color: #991b1b; }
+        .bleed-criteria { font-size: 10px; color: #64748b; margin-top: 5px; line-height: 1.5; padding-top: 5px; border-top: 1px solid #f1f5f9; }
+        .sepsis-row { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 10px; border: 1px solid #e2e8f0; margin-top: 10px; background: #fff; cursor: pointer; transition: all 0.15s; }
+        .sepsis-row:hover { border-color: #94a3b8; }
+        .sepsis-row.active { border-color: #dc2626; background: #fef2f2; }
+        .sepsis-toggle { width: 36px; height: 20px; border-radius: 10px; background: #cbd5e1; position: relative; transition: background 0.2s; flex-shrink: 0; }
+        .sepsis-row.active .sepsis-toggle { background: #dc2626; }
+        .sepsis-dot { width: 16px; height: 16px; border-radius: 50%; background: #fff; position: absolute; top: 2px; left: 2px; transition: transform 0.2s; }
+        .sepsis-row.active .sepsis-dot { transform: translateX(16px); }
+        .sepsis-label { font-size: 13px; font-weight: 600; color: #1e293b; }
+        .sepsis-row.active .sepsis-label { color: #991b1b; }
+        .sepsis-hint { font-size: 11px; color: #94a3b8; margin-left: auto; }
+        .cascade-msg { padding: 10px 14px; font-size: 12px; line-height: 1.5; margin: 8px 0; border-left: 3px solid; border-radius: 0; }
+        .cascade-msg.info { border-color: #3b82f6; background: #eff6ff; color: #1e40af; }
+        .cascade-msg.warn { border-color: #f59e0b; background: #fffbeb; color: #92400e; }
+        .cascade-msg.danger { border-color: #ef4444; background: #fef2f2; color: #991b1b; }
+        .step-divider { height: 1px; background: #e2e8f0; margin: 14px 0; }
+        .weight-band-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 10px 0; }
+        .weight-band { padding: 16px 12px; border-radius: 10px; border: 1px solid #e2e8f0; cursor: pointer; text-align: center; transition: all 0.15s; background: #fff; }
+        .weight-band:hover { border-color: #94a3b8; }
+        .weight-band.selected { border-color: var(--primary); background: #eef2ff; }
+        .weight-band .wb-range { font-size: 16px; font-weight: 700; color: #1e293b; }
+        .weight-band.selected .wb-range { color: var(--primary); }
+        .weight-band .wb-label { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+        .exact-weight-row { display: flex; align-items: center; gap: 10px; margin: 14px 0; }
+        .exact-weight-row input[type=number] { width: 90px; text-align: center; font-size: 16px; font-weight: 600; padding: 8px; border: 1px solid #e2e8f0; border-radius: 8px; }
+        .dose-preview-card { padding: 14px 16px; border-radius: 10px; background: #f8fafc; margin: 14px 0; }
+        .dose-row { display: flex; justify-content: space-between; align-items: baseline; margin: 5px 0; }
+        .dose-label { font-size: 12px; color: #64748b; }
+        .dose-val { font-size: 14px; font-weight: 600; color: #1e293b; }
+        .smart-aki-card { border: 2px solid var(--primary); border-radius: 10px; padding: 12px 14px; cursor: pointer; margin-bottom: 10px; transition: all 0.15s; position: relative; }
+        .smart-aki-card.selected { background: #eef2ff; }
+        .smart-aki-card .check { position: absolute; top: 8px; right: 10px; width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid #94a3b8; display: flex; align-items: center; justify-content: center; font-size: 11px; color: transparent; }
+        .smart-aki-card.selected .check { background: var(--primary); border-color: var(--primary); color: #fff; }
+        .choice-grid.two-col { grid-template-columns: 1fr 1fr; }
+        .choice-grid.three-col { grid-template-columns: repeat(3, 1fr); }
+
+        /* ═══ CASCADE SECTIONS ═══ */
+        .cascade-section {
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: max-height 0.45s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.35s ease, margin 0.35s ease;
+            margin-top: 0;
+        }
+        .cascade-section.open {
+            max-height: 2000px;
+            opacity: 1;
+            margin-top: 6px;
+        }
+        .cascade-connector {
+            width: 2px;
+            height: 0;
+            background: var(--primary);
+            margin: 0 auto;
+            transition: height 0.3s ease;
+            opacity: 0.3;
+        }
+        .cascade-connector.active {
+            height: 16px;
+        }
+        .section-card {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px;
+            transition: border-color 0.3s;
+        }
+        .section-card.completed {
+            border-color: #a5b4fc;
+            background: linear-gradient(135deg, #fff, #f5f7ff);
+        }
+        .section-card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        .section-card-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        .section-card-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1e293b;
+            letter-spacing: -0.01em;
+        }
+        .section-card-sub {
+            font-size: 11px;
+            color: #94a3b8;
+        }
+        .emergency-chip-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin: 8px 0;
+        }
+        .emergency-chip {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 20px;
+            background: #fff;
+            color: #94a3b8;
+            border: 1px solid #e2e8f0;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .emergency-chip:active { transform: scale(0.96); }
+        .emergency-chip.on {
+            background: #fef2f2;
+            border-color: #fca5a5;
+            color: #dc2626;
+        }
+        .emergency-banner {
+            display: none;
+            margin: 10px 0 4px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            font-size: 12px;
+            color: #991b1b;
+            line-height: 1.5;
+        }
+        .emergency-banner.show { display: block; }
+
+        @media (max-width: 500px) {
+            .choice-grid.two-col { grid-template-columns: 1fr; }
+            .choice-grid.three-col { grid-template-columns: 1fr; }
+            .weight-band-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- v14: SINGLE-PAGE DECISION CASCADE                      -->
+    <!-- Order: Entry → Emergency → Goals → Haemo → Shock →     -->
+    <!--        Bleeding+Liver → Special → Weight → Prescription -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+
+    <!-- ──── SECTION 1: ENTRY POINT ──── -->
+    <div class="section-card" id="sec-entry">
+        <div class="section-card-header">
+            <div class="section-card-icon" style="background:#eff6ff;color:var(--primary);">&#128167;</div>
+            <div>
+                <div class="section-card-title">Why does this patient need CRRT?</div>
+                <div class="section-card-sub">Determines treatment goals and dose targets</div>
+            </div>
+        </div>
+        <div class="choice-grid two-col">
+            <div class="choice-card" onclick="pickEntry('akin3')" data-value="akin3" id="entry-akin3">
+                <div class="check">&#10003;</div>
+                <div class="title">AKIN 3 &#8212; Standard AKI</div>
+                <div class="desc">Most ICU patients. Auto-selects all 4 treatment goals.</div>
+            </div>
+            <div class="choice-card" onclick="pickEntry('specific')" data-value="specific" id="entry-specific">
+                <div class="check">&#10003;</div>
+                <div class="title">Specific Indication</div>
+                <div class="desc">Poisoning, isolated volume, dysnatraemia, other.</div>
+            </div>
+        </div>
+
+        <!-- Emergency flags — non-blocking -->
+        <div style="margin-top: 14px;">
+            <div class="section-label" style="margin-top:0;">Emergency flags <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#94a3b8;">&#8212; adds urgency, doesn&#39;t block flow</span></div>
+            <div class="emergency-chip-row" id="emergencyChips">
+                <div class="emergency-chip" onclick="toggleEmergency(this)" data-value="refractory-k">K&#8314; &#8805;6.5 + ECG &#916;</div>
+                <div class="emergency-chip" onclick="toggleEmergency(this)" data-value="severe-acidosis">pH &#8804;7.15</div>
+                <div class="emergency-chip" onclick="toggleEmergency(this)" data-value="pulm-edema">Refractory pulm oedema</div>
+                <div class="emergency-chip" onclick="toggleEmergency(this)" data-value="toxin">Dialysable toxin</div>
+            </div>
+            <div class="emergency-banner" id="emergBanner">
+                <strong>&#9889; Emergency override active.</strong> Initiate RRT immediately (Barbar 2025, KDIGO). Prescription will reflect urgency.
+            </div>
+        </div>
+    </div>
+
+    <!-- ──── CONNECTOR ──── -->
+    <div class="cascade-connector" id="conn-goals"></div>
+
+    <!-- ──── SECTION 2: TREATMENT GOALS ──── -->
+    <div class="cascade-section" id="sec-goals">
+        <div class="section-card" id="card-goals">
+            <div class="section-card-header">
+                <div class="section-card-icon" style="background:#f0fdf4;color:#16a34a;">&#127919;</div>
+                <div>
+                    <div class="section-card-title">Treatment Goals</div>
+                    <div class="section-card-sub" id="goalsSubtitle">What must CRRT achieve?</div>
+                </div>
+            </div>
+
+            <!-- Smart AKI default (shown for AKIN 3 path) -->
+            <div id="smartDefaultArea">
+                <div class="smart-aki-card" onclick="toggleSmartDefault(this)" id="smartDefaultCard">
+                    <div class="check">&#10003;</div>
+                    <div class="title" style="font-weight:700;font-size:14px;">&#9889; Standard AKI &#8212; Select All Four</div>
+                    <div class="smart-tags">
+                        <span class="smart-tag">Volume</span>
+                        <span class="smart-tag">Solute Clearance</span>
+                        <span class="smart-tag">Acidosis</span>
+                        <span class="smart-tag">Electrolyte</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="choice-grid">
+                <div class="choice-card" onclick="toggleChoice(this, 'indication')" data-value="volume" id="goal-volume">
+                    <div class="check">&#10003;</div>
+                    <div class="title">Volume Removal</div>
+                    <div class="desc">Decongestion, fluid overload</div>
+                </div>
+                <div class="choice-card" onclick="toggleChoice(this, 'indication')" data-value="solute-clearance" id="goal-solute">
+                    <div class="check">&#10003;</div>
+                    <div class="title">Solute Clearance</div>
+                    <div class="desc">Uraemia, creatinine</div>
+                </div>
+                <div class="choice-card" onclick="toggleChoice(this, 'indication')" data-value="acidosis-correction" id="goal-acidosis">
+                    <div class="check">&#10003;</div>
+                    <div class="title">Acidosis Correction</div>
+                    <div class="desc">Metabolic acid-base</div>
+                </div>
+                <div class="choice-card" onclick="toggleChoice(this, 'indication')" data-value="electrolyte" id="goal-electrolyte">
+                    <div class="check">&#10003;</div>
+                    <div class="title">Electrolyte Control</div>
+                    <div class="desc">K&#8314;, PO&#8324;, Mg</div>
+                </div>
+            </div>
+            <div id="cascadeGoals"></div>
+        </div>
+    </div>
+
+    <!-- ──── CONNECTOR ──── -->
+    <div class="cascade-connector" id="conn-haemo"></div>
+
+    <!-- ──── SECTION 3: HAEMODYNAMICS ──── -->
+    <div class="cascade-section" id="sec-haemo">
+        <div class="section-card" id="card-haemo">
+            <div class="section-card-header">
+                <div class="section-card-icon" style="background:#fef2f2;color:#dc2626;">&#10084;&#65039;</div>
+                <div>
+                    <div class="section-card-title">Haemodynamic Status</div>
+                    <div class="section-card-sub">Drives modality, UF rate, and filter choice</div>
+                </div>
+            </div>
+            <div class="choice-grid two-col">
+                <div class="choice-card" onclick="pickHaemo('stable')" data-value="stable" id="haemo-stable">
+                    <div class="check">&#10003;</div>
+                    <div class="title">Stable</div>
+                    <div class="desc">MAP maintained &plusmn; low-dose NorA (&lt;0.1)</div>
+                </div>
+                <div class="choice-card" onclick="pickHaemo('vasopressors')" data-value="vasopressors" id="haemo-vaso">
+                    <div class="check">&#10003;</div>
+                    <div class="title">Vasoactive Support</div>
+                    <div class="desc">NorA &ge;0.1, dual agents, or escalating</div>
+                </div>
+            </div>
+
+            <!-- Shock sub-reveal -->
+            <div class="sub-reveal" id="shockSubReveal">
+                <div class="section-label">Shock type <span class="implied-tag">changes modality</span></div>
+                <div class="choice-grid three-col">
+                    <div class="choice-card" onclick="pickShock(this,'distributive')" data-value="distributive">
+                        <div class="check">&#10003;</div>
+                        <div class="title">Distributive</div>
+                        <div class="desc">Warm, vasodilated</div>
+                    </div>
+                    <div class="choice-card" onclick="pickShock(this,'cardiogenic')" data-value="cardiogenic">
+                        <div class="check">&#10003;</div>
+                        <div class="title">Cardiogenic</div>
+                        <div class="desc">Cold, congested, low CO</div>
+                    </div>
+                    <div class="choice-card" onclick="pickShock(this,'other')" data-value="other">
+                        <div class="check">&#10003;</div>
+                        <div class="title">Other / Mixed</div>
+                        <div class="desc">Undifferentiated</div>
+                    </div>
+                </div>
+
+                <div class="sepsis-row" id="sepsisRow" onclick="toggleSepsis()">
+                    <div class="sepsis-toggle"><div class="sepsis-dot"></div></div>
+                    <div class="sepsis-label">Sepsis present</div>
+                    <div class="sepsis-hint" id="sepsisHint"></div>
+                </div>
+            </div>
+
+            <div id="cascadeHaemo"></div>
+        </div>
+    </div>
+
+    <!-- ──── CONNECTOR ──── -->
+    <div class="cascade-connector" id="conn-anticoag"></div>
+
+    <!-- ──── SECTION 4: BLEEDING + LIVER ──── -->
+    <div class="cascade-section" id="sec-anticoag">
+        <div class="section-card" id="card-anticoag">
+            <div class="section-card-header">
+                <div class="section-card-icon" style="background:#faf5ff;color:#9333ea;">&#129656;</div>
+                <div>
+                    <div class="section-card-title">Anticoagulation Constraints</div>
+                    <div class="section-card-sub">Bleeding risk + liver function &#8594; anticoag choice</div>
+                </div>
+            </div>
+
+            <div class="section-label" style="margin-top:0;">Bleeding risk <span class="implied-tag">drives anticoagulation</span></div>
+            <div class="choice-grid two-col">
+                <div class="choice-card" onclick="selectSingle(this, 'bleeding')" data-value="low">
+                    <div class="check">&#10003;</div>
+                    <div class="title">Low</div>
+                    <div class="desc">No active bleeding, no recent surgery</div>
+                    <div class="bleed-criteria">Plt &gt;100 &#8226; INR &lt;1.5 &#8226; APTT normal &#8226; No therapeutic anticoag</div>
+                </div>
+                <div class="choice-card" onclick="selectSingle(this, 'bleeding')" data-value="moderate">
+                    <div class="check">&#10003;</div>
+                    <div class="title">Moderate</div>
+                    <div class="desc">Recent procedure or mild coagulopathy</div>
+                    <div class="bleed-criteria">Plt 50&#8211;100 &#8226; INR 1.5&#8211;2.0 &#8226; Surgery 48&#8211;72h ago &#8226; On therapeutic anticoag</div>
+                </div>
+                <div class="choice-card" onclick="selectSingle(this, 'bleeding')" data-value="high">
+                    <div class="check">&#10003;</div>
+                    <div class="title">High</div>
+                    <div class="desc">Active bleeding or severe coagulopathy</div>
+                    <div class="bleed-criteria">Active bleed &#8226; DIC &#8226; Plt &lt;50 &#8226; INR &gt;2.0 &#8226; APTT &gt;53s &#8226; Major surgery &lt;48h</div>
+                </div>
+                <div class="choice-card" onclick="selectSingle(this, 'bleeding')" data-value="hit">
+                    <div class="check">&#10003;</div>
+                    <div class="title">HIT Confirmed / Suspected</div>
+                    <div class="desc">All heparin products contraindicated</div>
+                    <div class="bleed-criteria">4Ts score &#8805;4 &#8226; Positive HIT antibody &#8226; Plt drop &gt;50% on heparin</div>
+                </div>
+            </div>
+
+            <div class="section-label">Liver function <span class="implied-tag">citrate safety</span></div>
+            <div class="choice-grid three-col">
+                <div class="choice-card" onclick="selectSingle(this, 'liver')" data-value="normal">
+                    <div class="check">&#10003;</div>
+                    <div class="title">Normal</div>
+                </div>
+                <div class="choice-card" onclick="selectSingle(this, 'liver')" data-value="impaired">
+                    <div class="check">&#10003;</div>
+                    <div class="title">Impaired</div>
+                    <div class="desc">Raised LFTs, coagulopathy</div>
+                </div>
+                <div class="choice-card" onclick="selectSingle(this, 'liver')" data-value="failing">
+                    <div class="check">&#10003;</div>
+                    <div class="title">Failing + Lactic Acidosis</div>
+                    <div class="desc">Non-clearing lactate</div>
+                </div>
+            </div>
+
+            <div id="cascadeAnticoag"></div>
+        </div>
+    </div>
+
+    <!-- ──── CONNECTOR ──── -->
+    <div class="cascade-connector" id="conn-special"></div>
+
+    <!-- ──── SECTION 5: SPECIAL FACTORS ──── -->
+    <div class="cascade-section" id="sec-special">
+        <div class="section-card" id="card-special">
+            <div class="section-card-header">
+                <div class="section-card-icon" style="background:#fffbeb;color:#d97706;">&#9888;&#65039;</div>
+                <div>
+                    <div class="section-card-title">Special Factors</div>
+                    <div class="section-card-sub">Select if applicable &#8212; modifies prescription</div>
+                </div>
+            </div>
+            <div class="choice-grid">
+                <div class="choice-card" onclick="toggleChoice(this, 'context')" data-value="ecmo">
+                    <div class="check">&#10003;</div>
+                    <div class="title">ECMO</div>
+                    <div class="desc">Circuit integration, shared anticoag</div>
+                </div>
+                <div class="choice-card" onclick="toggleChoice(this, 'context')" data-value="rhabdo">
+                    <div class="check">&#10003;</div>
+                    <div class="title">Rhabdomyolysis</div>
+                    <div class="desc">High clearance priority</div>
+                </div>
+                <div class="choice-card" onclick="toggleChoice(this, 'context')" data-value="dysnatemia">
+                    <div class="check">&#10003;</div>
+                    <div class="title">Dysnatraemia</div>
+                    <div class="desc">Na-safe protocol</div>
+                </div>
+            </div>
+            <div id="cascadeSpecial"></div>
+        </div>
+    </div>
+
+    <!-- ──── CONNECTOR ──── -->
+    <div class="cascade-connector" id="conn-weight"></div>
+
+    <!-- ──── SECTION 6: WEIGHT & DOSE ──── -->
+    <div class="cascade-section" id="sec-weight">
+        <div class="section-card" id="card-weight">
+            <div class="section-card-header">
+                <div class="section-card-icon" style="background:#f0fdfa;color:#0d9488;">&#9878;&#65039;</div>
+                <div>
+                    <div class="section-card-title">Weight &amp; Dose</div>
+                    <div class="section-card-sub">Prescribed 35 mL/kg/h &#8594; delivered ~25 mL/kg/h</div>
+                </div>
+            </div>
+
+            <div class="section-label" style="margin-top:0;">Weight category (Protocol v6 bands)</div>
+            <div class="weight-band-grid">
+                <div class="weight-band" onclick="selectWeight(this, 'lt60')" data-value="lt60">
+                    <div class="wb-range">&lt; 60 kg</div>
+                    <div class="wb-label">Default: 55 kg</div>
+                </div>
+                <div class="weight-band" onclick="selectWeight(this, '60-75')" data-value="60-75">
+                    <div class="wb-range">60 &#8211; 75 kg</div>
+                    <div class="wb-label">Default: 67 kg</div>
+                </div>
+                <div class="weight-band" onclick="selectWeight(this, 'gt75')" data-value="gt75">
+                    <div class="wb-range">&gt; 75 kg</div>
+                    <div class="wb-label">Default: 85 kg</div>
+                </div>
+            </div>
+
+            <div class="exact-weight-row">
+                <span style="font-size:13px;color:#64748b;">Or exact weight:</span>
+                <input type="number" id="exactWeight" min="30" max="200" placeholder="kg" oninput="onExactWeight(this.value)">
+                <span style="font-size:13px;color:#64748b;">kg</span>
+            </div>
+
+            <div id="bmiWarning"></div>
+
+            <div class="dose-preview-card" id="dosePreview" style="display:none;">
+                <div style="font-size:12px;font-weight:700;color:#64748b;margin-bottom:8px;">Dose preview</div>
+                <div class="dose-row"><span class="dose-label">Weight used</span><span class="dose-val" id="doseWtUsed"></span></div>
+                <div class="dose-row"><span class="dose-label">Prescribed dose (35 mL/kg/h)</span><span class="dose-val" id="dosePrescribed"></span></div>
+                <div class="dose-row"><span class="dose-label">Target delivered (~25 mL/kg/h)</span><span class="dose-val" id="doseDelivered"></span></div>
+                <div class="dose-row"><span class="dose-label">Effluent rate</span><span class="dose-val" id="doseEffluent"></span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ──── CONNECTOR ──── -->
+    <div class="cascade-connector" id="conn-rx"></div>
+
+    <!-- ═══════════════════════════════════ -->
+    <!-- OUTPUT -->
+    <!-- ═══════════════════════════════════ -->
+    <div class="output-panel" id="outputPanel">
+
+        <div class="step-question" style="margin-bottom: 16px;">Your CRRT Prescription</div>
+
+        <!-- Summary of selections -->
+        <div class="summary-strip" id="summaryStrip"></div>
+
+        <!-- Main Rx Card with Settings Grid -->
+        <div class="rx-card">
+            <div class="rx-header">
+                <h2 id="rxTitle">CVVHDF – Citrate Anticoagulation</h2>
+                <div class="subtitle" id="rxSubtitle">Goal-directed prescription based on 5 clinical selections</div>
+            </div>
+            <div class="rx-body">
+                <div class="settings-grid" id="settingsGrid">
+                    <!-- Populated by JS -->
+                </div>
+                <div id="protocolNote"></div>
+            </div>
+        </div>
+
+        <!-- Citrate Protocol (conditional) -->
+        <div id="citrateSection"></div>
+        <div id="anticoagEvidence"></div>
+
+        <!-- Dose Transparency -->
+        <div id="doseSection"></div>
+        <div id="doseEvidence"></div>
+
+        <!-- UF Recommendation -->
+        <div id="ufSection"></div>
+        <div id="ufEvidence"></div>
+
+        <!-- Monitoring Section -->
+        <div id="monitoringSection"></div>
+
+        <!-- Sepsis Evidence (conditional) -->
+        <div id="sepsisSection"></div>
+
+        <div id="dysnatremiaSection"></div>
+
+        <!-- MICU Protocol Reference Table -->
+        <div id="protocolTableSection"></div>
+
+        <!-- Special Populations Evidence (conditional) -->
+        <div id="specialPopsEvidence"></div>
+
+        <!-- Clinical Prompts (conditional) -->
+        <div id="clinicalPrompts"></div>
+
+        <!-- Key Evidence -->
+        <div id="evidenceBox"></div>
+
+        <!-- Clinical Reasoning -->
+        <div class="reasoning-card">
+            <div class="reasoning-header">&#129504; Clinical Reasoning – Why This Prescription?</div>
+            <div class="reasoning-body" id="reasoningBody">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+
+        <!-- Evidence Card -->
+        <div class="reasoning-card">
+            <div class="reasoning-header">&#128218; Evidence Base</div>
+            <div class="reasoning-body" id="evidenceBody">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+
+        <!-- Context-specific warnings -->
+        <div id="contextWarnings"></div>
+
+        <!-- Initiation Timing Algorithm (Barbar 2025 + Dr. CMY) -->
+        <div id="initiationTimingSection"></div>
+
+        <!-- Discontinuation & Step-Down Module (Ring 2 Build 1) -->
+        <div id="discontinuationSection"></div>
+
+        <div style="text-align: center; margin-top: 24px;">
+            <button class="btn btn-restart" onclick="restart()">&#8592; Start Over</button>
+            <button class="btn btn-next" style="margin-left: 8px;" onclick="alert('In v12, this would switch to Detailed Mode with all fields pre-populated from your Quick Mode selections.')">Refine in Detailed Mode &#8594;</button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // ═══════════════════════════════════
+    // STATE (v14: single-page cascade)
+    // ═══════════════════════════════════
+
+    // Legacy selections object — generatePrescription() reads from this.
+    // bridgeState() populates it from the v14 UI before prescription generation.
+    const selections = {
+        indication: new Set(),
+        haemo: null,
+        bleeding: null,
+        context: new Set(),
+        weight: null,
+        exactWeight: null
+    };
+
+    // v14 state — drives UI interactions and cascade logic
+    const v13 = {
+        entry: null,           // 'akin3' | 'specific'
+        haemo: null,           // 'stable' (MAP maintained ± NorA <0.1) | 'vasopressors' (NorA ≥0.1, dual agents, or escalating)
+        shocktype: null,       // 'distributive' | 'cardiogenic' | 'other'
+        sepsis: false,         // boolean
+        emergencies: new Set(),// 'refractory-k', 'severe-acidosis', 'pulm-edema', 'toxin'
+        bleeding: null,        // 'low' | 'moderate' | 'high' | 'hit'
+        liver: null,           // 'normal' | 'impaired' | 'failing'
+        goals: new Set(),      // 'volume', 'solute-clearance', 'acidosis-correction', 'electrolyte'
+        special: new Set(),    // 'ecmo', 'rhabdo', 'dysnatemia'
+        weightBand: null,      // 'lt60' | '60-75' | 'gt75'
+        weightKg: null         // number or null
+    };
+
+    // ═══════════════════════════════════
+    // BRIDGE: v14 state → legacy selections
+    // Called before generatePrescription() so the 1300-line output engine works unchanged
+    // ═══════════════════════════════════
+    function bridgeState() {
+        // Clear legacy state
+        selections.indication.clear();
+        selections.context.clear();
+
+        // Map emergencies → indication set
+        v13.emergencies.forEach(e => selections.indication.add(e));
+
+        // Map goals → indication set (same values as old step 1)
+        v13.goals.forEach(g => selections.indication.add(g));
+
+        // Map haemo + shocktype → legacy haemo values
+        if (v13.haemo === 'stable') {
+            selections.haemo = 'stable';
+        } else if (v13.haemo === 'vasopressors') {
+            if (v13.shocktype === 'distributive') selections.haemo = 'unstable-distributive';
+            else if (v13.shocktype === 'cardiogenic') selections.haemo = 'unstable-cardiogenic';
+            else if (v13.shocktype === 'other') selections.haemo = 'mixed';
+            else selections.haemo = 'stable-pressors';
+        } else {
+            selections.haemo = null;
+        }
+
+        // Map bleeding (direct mapping)
+        selections.bleeding = v13.bleeding;
+
+        // Liver: generatePrescription() now reads v13.liver directly.
+        // For legacy compatibility, also set bleeding to 'liver-failure' if liver is failing
+        // AND no separate bleeding risk was selected.
+        if (v13.liver === 'failing' && !v13.bleeding) {
+            selections.bleeding = 'liver-failure';
+        }
+
+        // Map special factors → context set
+        v13.special.forEach(s => selections.context.add(s));
+
+        // Sepsis → context (drives Oxiris logic in generatePrescription)
+        if (v13.sepsis) selections.context.add('sepsis');
+
+        // Weight
+        selections.weight = v13.weightBand;
+        selections.exactWeight = v13.weightKg && document.getElementById('exactWeight').value ? v13.weightKg : null;
+    }
+
+    // ═══════════════════════════════════
+    // CASCADE REVEAL HELPERS
+    // ═══════════════════════════════════
+    function revealSection(sectionId, connectorId) {
+        const sec = document.getElementById(sectionId);
+        const conn = document.getElementById(connectorId);
+        if (sec) sec.classList.add('open');
+        if (conn) conn.classList.add('active');
+        // Scroll to the newly revealed section
+        setTimeout(() => {
+            if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 150);
+    }
+
+    function hideSection(sectionId, connectorId) {
+        const sec = document.getElementById(sectionId);
+        const conn = document.getElementById(connectorId);
+        if (sec) sec.classList.remove('open');
+        if (conn) conn.classList.remove('active');
+    }
+
+    function markCompleted(cardId) {
+        const card = document.getElementById(cardId);
+        if (card) card.classList.add('completed');
+    }
+
+    function unmarkCompleted(cardId) {
+        const card = document.getElementById(cardId);
+        if (card) card.classList.remove('completed');
+    }
+
+    // Hide everything downstream of a given section
+    function hideDownstream(fromSection) {
+        const order = [
+            { sec: 'sec-goals', conn: 'conn-goals', card: 'card-goals' },
+            { sec: 'sec-haemo', conn: 'conn-haemo', card: 'card-haemo' },
+            { sec: 'sec-anticoag', conn: 'conn-anticoag', card: 'card-anticoag' },
+            { sec: 'sec-special', conn: 'conn-special', card: 'card-special' },
+            { sec: 'sec-weight', conn: 'conn-weight', card: 'card-weight' },
+            { sec: 'sec-rx', conn: 'conn-rx', card: null }
+        ];
+        const idx = order.findIndex(o => o.sec === fromSection);
+        if (idx === -1) return;
+        for (let i = idx; i < order.length; i++) {
+            hideSection(order[i].sec, order[i].conn);
+            if (order[i].card) unmarkCompleted(order[i].card);
+        }
+        // Also hide output
+        const output = document.getElementById('outputPanel');
+        if (output) output.classList.remove('active');
+    }
+
+    // ═══════════════════════════════════
+    // SECTION 1: ENTRY POINT
+    // ═══════════════════════════════════
+    function pickEntry(value) {
+        v13.entry = value;
+        // Deselect both
+        document.getElementById('entry-akin3').classList.remove('selected');
+        document.getElementById('entry-specific').classList.remove('selected');
+        // Select chosen
+        document.getElementById(value === 'akin3' ? 'entry-akin3' : 'entry-specific').classList.add('selected');
+
+        // Reset downstream
+        v13.goals.clear();
+        v13.haemo = null;
+        v13.shocktype = null;
+        v13.sepsis = false;
+        v13.bleeding = null;
+        v13.liver = null;
+        v13.special.clear();
+        v13.weightBand = null;
+        v13.weightKg = null;
+
+        // Clear downstream selections UI
+        document.querySelectorAll('#sec-goals .choice-card, #sec-haemo .choice-card, #sec-anticoag .choice-card, #sec-special .choice-card').forEach(c => c.classList.remove('selected'));
+        document.querySelectorAll('.weight-band').forEach(w => w.classList.remove('selected'));
+        const sdCard = document.getElementById('smartDefaultCard');
+        if (sdCard) sdCard.classList.remove('selected');
+        document.getElementById('shockSubReveal').classList.remove('open');
+        document.getElementById('sepsisRow').classList.remove('active');
+        document.getElementById('sepsisHint').textContent = '';
+        document.getElementById('exactWeight').value = '';
+        document.getElementById('dosePreview').style.display = 'none';
+        document.getElementById('bmiWarning').innerHTML = '';
+
+        // Hide everything below entry
+        hideDownstream('sec-goals');
+
+        // Reveal goals
+        revealSection('sec-goals', 'conn-goals');
+
+        if (value === 'akin3') {
+            document.getElementById('goalsSubtitle').textContent = 'AKIN 3 \u2014 all standard goals auto-selected';
+            // Auto-select smart default
+            const card = document.getElementById('smartDefaultCard');
+            if (card && !card.classList.contains('selected')) {
+                toggleSmartDefault(card);
+            }
+            // Auto-advance: mark goals complete, reveal haemo
+            setTimeout(() => {
+                markCompleted('card-goals');
+                revealSection('sec-haemo', 'conn-haemo');
+            }, 350);
+        } else {
+            document.getElementById('goalsSubtitle').textContent = 'Select the treatment goals for this specific indication';
+            // Don't auto-select — user picks manually
+        }
+    }
+
+    // ═══════════════════════════════════
+    // EMERGENCY FLAGS
+    // ═══════════════════════════════════
+    function toggleEmergency(chip) {
+        const val = chip.dataset.value;
+        chip.classList.toggle('on');
+        if (v13.emergencies.has(val)) {
+            v13.emergencies.delete(val);
+        } else {
+            v13.emergencies.add(val);
+        }
+        document.getElementById('emergBanner').classList.toggle('show', v13.emergencies.size > 0);
+        // If prescription already generated, refresh it
+        tryAutoGenerate();
+    }
+
+    // ═══════════════════════════════════
+    // SECTION 2: GOALS
+    // ═══════════════════════════════════
+    function toggleChoice(card, group) {
+        const val = card.dataset.value;
+        card.classList.toggle('selected');
+
+        if (group === 'indication') {
+            if (v13.goals.has(val)) {
+                v13.goals.delete(val);
+            } else {
+                v13.goals.add(val);
+            }
+            syncSmartDefault();
+            // If goals selected and haemo not yet visible, reveal it
+            if (v13.goals.size > 0 && !document.getElementById('sec-haemo').classList.contains('open')) {
+                markCompleted('card-goals');
+                revealSection('sec-haemo', 'conn-haemo');
+            }
+        } else if (group === 'context') {
+            if (v13.special.has(val)) {
+                v13.special.delete(val);
+            } else {
+                v13.special.add(val);
+            }
+        }
+        updateCascade();
+        tryAutoGenerate();
+    }
+
+    function toggleSmartDefault(card) {
+        const standardGoals = ['volume', 'acidosis-correction', 'electrolyte', 'solute-clearance'];
+        const isCurrentlySelected = card.classList.contains('selected');
+
+        if (isCurrentlySelected) {
+            card.classList.remove('selected');
+            standardGoals.forEach(goal => {
+                v13.goals.delete(goal);
+                const c = document.querySelector('#sec-goals .choice-card[data-value="' + goal + '"]');
+                if (c) c.classList.remove('selected');
+            });
+        } else {
+            card.classList.add('selected');
+            standardGoals.forEach(goal => {
+                v13.goals.add(goal);
+                const c = document.querySelector('#sec-goals .choice-card[data-value="' + goal + '"]');
+                if (c) c.classList.add('selected');
+            });
+        }
+        updateCascade();
+        // If goals now selected and haemo not visible, reveal it
+        if (v13.goals.size > 0 && !document.getElementById('sec-haemo').classList.contains('open')) {
+            markCompleted('card-goals');
+            revealSection('sec-haemo', 'conn-haemo');
+        }
+    }
+
+    function syncSmartDefault() {
+        const standardGoals = ['volume', 'acidosis-correction', 'electrolyte', 'solute-clearance'];
+        const allSelected = standardGoals.every(g => v13.goals.has(g));
+        const sdCard = document.getElementById('smartDefaultCard');
+        if (sdCard) {
+            sdCard.classList.toggle('selected', allSelected);
+        }
+    }
+
+    // ═══════════════════════════════════
+    // SECTION 3: HAEMODYNAMICS
+    // ═══════════════════════════════════
+    function pickHaemo(value) {
+        if (v13.haemo === value) {
+            v13.haemo = null;
+        } else {
+            v13.haemo = value;
+        }
+        document.getElementById('haemo-stable').classList.toggle('selected', v13.haemo === 'stable');
+        document.getElementById('haemo-vaso').classList.toggle('selected', v13.haemo === 'vasopressors');
+
+        // Show/hide shock sub-reveal
+        const sub = document.getElementById('shockSubReveal');
+        if (v13.haemo === 'vasopressors') {
+            sub.classList.add('open');
+        } else {
+            sub.classList.remove('open');
+            v13.shocktype = null;
+            v13.sepsis = false;
+            sub.querySelectorAll('.choice-card').forEach(c => c.classList.remove('selected'));
+            document.getElementById('sepsisRow').classList.remove('active');
+            document.getElementById('sepsisHint').textContent = '';
+        }
+
+        // Hide downstream from anticoag
+        hideDownstream('sec-anticoag');
+
+        // If stable selected, reveal anticoag immediately
+        if (v13.haemo === 'stable') {
+            markCompleted('card-haemo');
+            revealSection('sec-anticoag', 'conn-anticoag');
+        }
+        // If vasopressors, wait for shock type selection
+
+        updateCascade();
+    }
+
+    function pickShock(card, value) {
+        const parent = card.closest('.choice-grid');
+        parent.querySelectorAll('.choice-card').forEach(c => c.classList.remove('selected'));
+
+        if (v13.shocktype === value) {
+            v13.shocktype = null;
+        } else {
+            v13.shocktype = value;
+            card.classList.add('selected');
+        }
+
+        // Auto-sepsis logic
+        const sepsisRow = document.getElementById('sepsisRow');
+        if (v13.shocktype === 'distributive') {
+            if (!v13.sepsis) {
+                v13.sepsis = true;
+                sepsisRow.classList.add('active');
+                document.getElementById('sepsisHint').textContent = 'auto: distributive \u2192 sepsis likely';
+            }
+        } else if (v13.shocktype === 'cardiogenic') {
+            v13.sepsis = false;
+            sepsisRow.classList.remove('active');
+            document.getElementById('sepsisHint').textContent = '';
+        }
+
+        // If shock type selected, reveal anticoag
+        if (v13.shocktype) {
+            markCompleted('card-haemo');
+            hideDownstream('sec-anticoag');
+            revealSection('sec-anticoag', 'conn-anticoag');
+        }
+
+        updateCascade();
+    }
+
+    function toggleSepsis() {
+        v13.sepsis = !v13.sepsis;
+        document.getElementById('sepsisRow').classList.toggle('active', v13.sepsis);
+        if (!v13.sepsis) {
+            document.getElementById('sepsisHint').textContent = '';
+        } else if (v13.shocktype === 'distributive') {
+            document.getElementById('sepsisHint').textContent = 'sepsis confirmed';
+        }
+        updateCascade();
+        tryAutoGenerate();
+    }
+
+    // ═══════════════════════════════════
+    // SECTION 4: BLEEDING + LIVER
+    // ═══════════════════════════════════
+    function selectSingle(card, group) {
+        const parent = card.closest('.choice-grid');
+        const val = card.dataset.value;
+        const wasSelected = card.classList.contains('selected');
+
+        parent.querySelectorAll('.choice-card').forEach(c => c.classList.remove('selected'));
+
+        if (wasSelected) {
+            if (group === 'bleeding') v13.bleeding = null;
+            if (group === 'liver') v13.liver = null;
+        } else {
+            card.classList.add('selected');
+            if (group === 'bleeding') v13.bleeding = val;
+            if (group === 'liver') v13.liver = val;
+        }
+
+        updateCascade();
+
+        // If both bleeding and liver are set, reveal special + weight
+        if (v13.bleeding && v13.liver) {
+            markCompleted('card-anticoag');
+            revealSection('sec-special', 'conn-special');
+            revealSection('sec-weight', 'conn-weight');
+        }
+    }
+
+    // ═══════════════════════════════════
+    // SECTION 6: WEIGHT
+    // ═══════════════════════════════════
+    function selectWeight(el, value) {
+        document.querySelectorAll('.weight-band').forEach(w => w.classList.remove('selected'));
+        if (v13.weightBand === value) {
+            v13.weightBand = null;
+            v13.weightKg = null;
+        } else {
+            v13.weightBand = value;
+            v13.weightKg = value === 'lt60' ? 55 : value === '60-75' ? 67 : 85;
+            el.classList.add('selected');
+        }
+        document.getElementById('exactWeight').value = '';
+        updateDosePreview();
+        tryAutoGenerate();
+    }
+
+    function onExactWeight(val) {
+        const w = parseInt(val);
+        if (!w || w < 30 || w > 200) {
+            v13.weightKg = null;
+            updateDosePreview();
+            return;
+        }
+        v13.weightKg = w;
+        v13.weightBand = w < 60 ? 'lt60' : w <= 75 ? '60-75' : 'gt75';
+        // Highlight matching band
+        document.querySelectorAll('.weight-band').forEach(b => b.classList.remove('selected'));
+        const matchBand = document.querySelector('.weight-band[data-value="' + v13.weightBand + '"]');
+        if (matchBand) matchBand.classList.add('selected');
+        updateDosePreview();
+        tryAutoGenerate();
+    }
+
+    function updateDosePreview() {
+        const preview = document.getElementById('dosePreview');
+        const w = v13.weightKg;
+        if (!w) {
+            preview.style.display = 'none';
+            document.getElementById('bmiWarning').innerHTML = '';
+            return;
+        }
+        preview.style.display = 'block';
+        const bandLabel = v13.weightBand === 'lt60' ? '<60' : v13.weightBand === '60-75' ? '60\u201375' : '>75';
+        document.getElementById('doseWtUsed').textContent = w + ' kg (' + bandLabel + ' band)';
+        document.getElementById('dosePrescribed').textContent = Math.round(w * 35).toLocaleString() + ' mL/h';
+        document.getElementById('doseDelivered').textContent = Math.round(w * 25).toLocaleString() + ' mL/h';
+        document.getElementById('doseEffluent').textContent = '~' + Math.round(w * 35 / 60) + ' mL/min';
+
+        // BMI warning for obesity
+        document.getElementById('bmiWarning').innerHTML = w >= 100 ?
+            '<div class="cascade-msg warn">Weight \u2265100 kg (BMI likely \u226530): consider Ideal Body Weight for dosing. Peters 2023 (n=1,033): ABW in obesity associated with increased mortality. Both IBW and ABW calculations will be shown.</div>' : '';
+    }
+
+    // ═══════════════════════════════════
+    // CASCADE MESSAGES
+    // ═══════════════════════════════════
+    function updateCascade() {
+        // Haemo cascade
+        var haemoMsgs = [];
+        if (v13.haemo === 'vasopressors' && v13.emergencies.size === 0 && !v13.shocktype) {
+            haemoMsgs.push({t:'warn', m:'Significant vasoactive support (NorA \u22650.1 or dual agents) without emergency: Barbar 2025 recommends reassessing Q8h. Optimise resuscitation before initiating CRRT.'});
+        }
+        if (v13.haemo === 'vasopressors' && v13.emergencies.size > 0) {
+            haemoMsgs.push({t:'danger', m:'Vasoactive support + emergency: start CRRT but anticipate instability. Consider slower blood flow, cautious UF.'});
+        }
+        if (v13.shocktype === 'cardiogenic') {
+            haemoMsgs.push({t:'info', m:'Cardiogenic: SCUF preferred for volume-only goals. Cautious UF rates.'});
+        }
+        if (v13.shocktype === 'distributive' && v13.sepsis) {
+            haemoMsgs.push({t:'info', m:'Septic shock: Oxiris filter triggered. 3-gate assessment: vasopressor burden (NorA >0.5) + abdominal/GN source + inflammatory markers. Evaluate at 72h.'});
+        }
+        if (v13.shocktype === 'distributive' && !v13.sepsis) {
+            haemoMsgs.push({t:'info', m:'Non-septic distributive (anaphylaxis, neurogenic, adrenal): standard M100 filter.'});
+        }
+        if (v13.sepsis && v13.shocktype === 'cardiogenic') {
+            haemoMsgs.push({t:'info', m:'Septic cardiomyopathy: consider Oxiris. Combine volume caution (cardiogenic) with sepsis-directed filter strategy.'});
+        }
+        if (v13.sepsis && v13.shocktype === 'other') {
+            haemoMsgs.push({t:'info', m:'Sepsis with mixed/undifferentiated shock: Oxiris consideration applies. Clarify phenotype as resuscitation progresses.'});
+        }
+        var el1 = document.getElementById('cascadeHaemo');
+        if (el1) el1.innerHTML = haemoMsgs.map(function(m){ return '<div class="cascade-msg ' + m.t + '">' + m.m + '</div>'; }).join('');
+
+        // Anticoag cascade
+        var anticoagMsgs = [];
+        if (v13.liver === 'failing') {
+            anticoagMsgs.push({t:'danger', m:'Liver failure: citrate contraindicated (impaired metabolism \u2192 accumulation risk). Will route to heparin or no anticoagulation.'});
+        }
+        if (v13.liver === 'impaired') {
+            anticoagMsgs.push({t:'warn', m:'Impaired liver: citrate usable with enhanced monitoring (total Ca:iCa ratio Q6h). Watch for citrate accumulation (ratio >2.5).'});
+        }
+        if (v13.bleeding === 'high' && v13.liver !== 'failing') {
+            anticoagMsgs.push({t:'info', m:'High bleeding + liver OK: Citrate is IDEAL here. Regional anticoagulation means no systemic bleeding risk. Bleeding is NOT a citrate contraindication.'});
+        }
+        if (v13.bleeding === 'hit') {
+            anticoagMsgs.push({t:'danger', m:'HIT: all heparin contraindicated. Citrate (first-line, no heparin needed) or argatroban/bivalirudin if on ECMO.'});
+        }
+        var el2 = document.getElementById('cascadeAnticoag');
+        if (el2) el2.innerHTML = anticoagMsgs.map(function(m){ return '<div class="cascade-msg ' + m.t + '">' + m.m + '</div>'; }).join('');
+    }
+
+    // ═══════════════════════════════════
+    // AUTO-GENERATE PRESCRIPTION
+    // ═══════════════════════════════════
+    function tryAutoGenerate() {
+        // Only generate if all required fields are set
+        if (!v13.haemo) return;
+        if (v13.goals.size === 0) return;
+        if (!v13.bleeding || !v13.liver) return;
+        if (!v13.weightKg && !v13.weightBand) return;
+
+        // If vasopressors but no shock type yet, don't generate
+        if (v13.haemo === 'vasopressors' && !v13.shocktype) return;
+
+        safeGeneratePrescription();
+    }
+
+    // ═══════════════════════════════════
+    // ERROR TRAP + BRIDGE
+    // ═══════════════════════════════════
+    function safeGeneratePrescription() {
+        try {
+            // Bridge v14 state to legacy selections before generating
+            bridgeState();
+            generatePrescription();
+        } catch(e) {
+            const output = document.getElementById('outputPanel');
+            output.classList.add('active');
+            output.innerHTML = `
+                <div style="padding: 32px; text-align: center;">
+                    <div style="font-size: 48px; margin-bottom: 16px;">\u26A0\uFE0F</div>
+                    <h2 style="color: #dc2626; margin-bottom: 12px;">Prescription Generation Error</h2>
+                    <p style="color: #475569; margin-bottom: 20px;">Something went wrong. Please share this with the developer.</p>
+                    <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 16px; text-align: left; font-family: monospace; font-size: 12px; color: #991b1b; white-space: pre-wrap; word-break: break-word;">
+<strong>Error:</strong> ${e.message}
+
+<strong>Location:</strong> ${e.stack ? e.stack.split('\\n').slice(0,4).join('\\n') : 'Unknown'}
+
+<strong>v14 State:</strong>
+Entry: ${v13.entry || 'none'}
+Haemo: ${v13.haemo || 'none'} | Shock: ${v13.shocktype || 'none'} | Sepsis: ${v13.sepsis}
+Emergencies: ${[...v13.emergencies].join(', ') || 'none'}
+Bleeding: ${v13.bleeding || 'none'} | Liver: ${v13.liver || 'none'}
+Goals: ${[...v13.goals].join(', ') || 'none'}
+Special: ${[...v13.special].join(', ') || 'none'}
+Weight: ${v13.weightKg || 'none'} (${v13.weightBand || 'no band'})
+
+<strong>Bridge (legacy):</strong>
+Indications: ${[...selections.indication].join(', ') || 'none'}
+Haemodynamics: ${selections.haemo || 'none'}
+Bleeding: ${selections.bleeding || 'none'}
+Context: ${[...selections.context].join(', ') || 'none'}
+Weight: ${selections.exactWeight || selections.weight || 'none'}
+                    </div>
+                    <button onclick="restart()" class="btn btn-next" style="margin-top: 20px;">\u2190 Start Over</button>
+                </div>`;
+            console.error('REINA generatePrescription() error:', e);
+        }
+    }
+
+    // ═══════════════════════════════════
+    // RESTART
+    // ═══════════════════════════════════
+    function restart() {
+        v13.entry = null;
+        v13.haemo = null;
+        v13.shocktype = null;
+        v13.sepsis = false;
+        v13.emergencies.clear();
+        v13.bleeding = null;
+        v13.liver = null;
+        v13.goals.clear();
+        v13.special.clear();
+        v13.weightBand = null;
+        v13.weightKg = null;
+
+        // Clear legacy
+        selections.indication.clear();
+        selections.haemo = null;
+        selections.bleeding = null;
+        selections.context.clear();
+        selections.weight = null;
+        selections.exactWeight = null;
+
+        // Reset all UI
+        document.querySelectorAll('.choice-card').forEach(c => c.classList.remove('selected'));
+        document.querySelectorAll('.weight-band').forEach(w => w.classList.remove('selected'));
+        document.querySelectorAll('.smart-aki-card').forEach(c => c.classList.remove('selected'));
+        document.querySelectorAll('.emergency-chip').forEach(c => c.classList.remove('on'));
+        document.querySelectorAll('.section-card').forEach(c => c.classList.remove('completed'));
+        document.getElementById('entry-akin3').classList.remove('selected');
+        document.getElementById('entry-specific').classList.remove('selected');
+        document.getElementById('exactWeight').value = '';
+        document.getElementById('shockSubReveal').classList.remove('open');
+        document.getElementById('sepsisRow').classList.remove('active');
+        document.getElementById('sepsisHint').textContent = '';
+        document.getElementById('dosePreview').style.display = 'none';
+        document.getElementById('bmiWarning').innerHTML = '';
+        document.getElementById('emergBanner').classList.remove('show');
+
+        // Clear cascade messages
+        ['cascadeGoals', 'cascadeHaemo', 'cascadeAnticoag', 'cascadeSpecial'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.innerHTML = '';
+        });
+
+        // Hide all cascade sections
+        hideDownstream('sec-goals');
+
+        // Hide output
+        document.getElementById('outputPanel').classList.remove('active');
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Legacy compatibility stubs
+    function updateNavButtons() {}
+    function updateCounts() {}
+    function showQuickMode() {}
+    function showDetailedMode() {}
+    function renderStep() {}
+
+    // ═══════════════════════════════════
+    // GENERATE PRESCRIPTION
+    // ═══════════════════════════════════
+    // =====================================================================
+    // RING 3: EVIDENCE DATABASE — Compact inline cards
+    // 17 queries across 9 domains. Each entry: trial, year, n, grade, finding, implication
+    // Last updated: 2026-03-25
+    // =====================================================================
+    const EVIDENCE_UPDATED = '2026-03-25';
+    const evidenceDB = {
+        dose: [
+            { trial:'RENAL', year:2009, n:1508, grade:'HIGH', finding:'40 vs 25 mL/kg/h effluent \u2014 no mortality difference (44.7% vs 44.7%, OR 1.00)', implication:'Target 20\u201325 mL/kg/h delivered. Higher dose adds cost, not survival.' },
+            { trial:'ATN', year:2008, n:1124, grade:'HIGH', finding:'Intensive vs standard dosing \u2014 no benefit (53.6% vs 51.5%, p=0.44)', implication:'Confirms dose ceiling across mixed modalities (IHD + CRRT).' },
+            { trial:'IVOIRE', year:2013, n:137, grade:'MODERATE', finding:'HVHF 70 vs 35 mL/kg/h in septic AKI \u2014 no mortality or haemodynamic benefit', implication:'Do not escalate dose for sepsis. Cytokine removal is by adsorption, not convection.' },
+            { trial:'Peters (obesity)', year:2023, n:1033, grade:'MODERATE', finding:'ABW-based dosing in obesity \u2192 higher mortality; IBW neutralises risk', implication:'\uD83D\uDFE1 Show both IBW and ABW. Let clinician decide.' },
+        ],
+        anticoag: [
+            { trial:'RICH (Zarbock)', year:2020, n:596, grade:'HIGH', finding:'Citrate vs heparin: filter life 47h vs 26h (p<0.001). Less bleeding, no mortality difference.', implication:'Citrate first-line for CRRT. Switch only for specific contraindications.' },
+            { trial:'Citrate accumulation (Q3.3)', year:2024, n:null, grade:'MODERATE', finding:'Accumulation ~12% with protocolised care. Shock + lactic acidosis is the real risk, not liver failure alone.', implication:'Liver failure \u2260 absolute CI. Enhanced monitoring (tCa:iCa Q4h) is the answer.' },
+            { trial:'KDIGO 2012', year:2012, n:null, grade:'HIGH', finding:'Regional citrate recommended as first-line for CRRT in patients without citrate contraindications.', implication:'Guideline-concordant: citrate is default unless specific reason not to.' },
+        ],
+        filter: [
+            { trial:'Oxiris meta-analysis', year:2023, n:695, grade:'LOW', finding:'14 studies: lower 28-day mortality (OR 0.53), faster vasopressor weaning. 60\u201390d mortality unchanged.', implication:'Promising for abdominal/GN sepsis. Not proven \u2014 use 3-gate selection.' },
+            { trial:'Broman (crossover RCT)', year:2019, n:16, grade:'LOW', finding:'Endotoxin reduced 78% Oxiris vs 17% standard. Greater TNF-\u03B1, IL-6, IL-8 reduction.', implication:'Mechanistic support for endotoxin adsorption. Very small sample.' },
+            { trial:'Membrane comparison (Q6.1)', year:2021, n:null, grade:'MODERATE', finding:'AN69 (Oxiris base): stronger cytokine adsorption, but adsorbs some drugs. Polysulfone (M100): predictable PK.', implication:'M100 = reliable standard. Oxiris = adsorptive advantage in sepsis, monitor drug levels.' },
+        ],
+        timing: [
+            { trial:'STARRT-AKI', year:2020, n:2927, grade:'HIGH', finding:'Accelerated vs standard timing: ~38% in delayed arm never needed RRT. No mortality difference.', implication:'Watchful waiting avoids unnecessary RRT in over a third of patients.' },
+            { trial:'AKIKI', year:2016, n:620, grade:'HIGH', finding:'Early vs delayed: no mortality difference. 49% of delayed arm avoided RRT entirely.', implication:'Default to watchful waiting for non-emergency indications.' },
+            { trial:'AKIKI-2', year:2021, n:278, grade:'HIGH', finding:'More-delayed strategy: HR 1.65 for mortality if delayed past oliguria >72h or BUN >112.', implication:'72h is the maximum safe delay window. Do not push further.' },
+            { trial:'IDEAL-ICU', year:2018, n:488, grade:'HIGH', finding:'Septic AKI: early vs delayed \u2014 no benefit from early start. Stopped for futility.', implication:'Even in sepsis, early RRT does not improve outcomes.' },
+            { trial:'Barbar ICM review', year:2025, n:null, grade:'HIGH', finding:'Comprehensive algorithm: emergency \u2192 immediate; no emergency \u2192 watchful waiting + Q8h reassessment; max 72h.', implication:'Practical bedside framework. Encoded in REINA\u2019s initiation timing panel.' },
+        ],
+        modality: [
+            { trial:'Network meta-analyses', year:2021, n:null, grade:'MODERATE', finding:'CVVH vs CVVHD vs CVVHDF: no mortality or renal recovery differences when dose matched.', implication:'Choose modality by clinical need (solute clearance, circuit life), not superiority.' },
+            { trial:'Barbar 2025 (modality)', year:2025, n:null, grade:'MODERATE', finding:'Convection (CVVH) has no proven advantage over diffusion (CVVHD). CVVHD has fewer alarms.', implication:'CVVHDF is a reasonable default. CVVHD acceptable for pure electrolyte/acidosis.' },
+        ],
+        discontinuation: [
+            { trial:'Raina Delphi consensus', year:2025, n:null, grade:'MODERATE', finding:'Daily readiness assessment using composite markers. UO >400\u2013500 mL/24h is strongest predictor (AUC 0.8\u20130.9).', implication:'Use 6-criterion checklist. UO is the anchor variable for trial-off decisions.' },
+            { trial:'Baeg/Jeon bedside score', year:2024, n:null, grade:'MODERATE', finding:'Validated 4-variable model (UO + MAP + K\u207A + BUN): AUROC 0.73\u20130.75, ~70% success prediction.', implication:'Composite outperforms single variables. Built into REINA\u2019s discontinuation module.' },
+            { trial:'IHD transition (Q7.2)', year:2023, n:null, grade:'LOW', finding:'Any vasopressor at transition \u2192 3.9\u00D7 IDH risk. Higher MAP independently predicts success (aOR 1.02/mmHg).', implication:'MAP \u226570\u201375, off vasopressors before IHD. Consider SLED as bridge.' },
+            { trial:'Shawwa (prolonged CRRT)', year:2021, n:null, grade:'MODERATE', finding:'>7 days CRRT without recovery associated with higher 90-day dialysis dependence.', implication:'Daily reassessment essential. Goals-of-care discussion if no recovery by day 7.' },
+        ],
+        uf: [
+            { trial:'Murugan (RENAL secondary)', year:2021, n:1434, grade:'MODERATE', finding:'Net UF >1.01 mL/kg/h associated with higher mortality. J-shaped curve \u2014 both extremes harmful.', implication:'Conservative UF default. Aggressive fluid removal harms unstable patients.' },
+        ],
+        drugDosing: [
+            { trial:'TDM consensus (multi-study)', year:2024, n:null, grade:'MODERATE', finding:'Full loading doses essential. Maintenance guided by effluent rate + residual function. CRRT clearance rises linearly with effluent flow.', implication:'Never auto-reduce doses. TDM mandatory for vancomycin, aminoglycosides.' },
+            { trial:'Oxiris drug adsorption', year:2025, n:null, grade:'LOW', finding:'AN69ST membrane adsorbs nafamostat, certain antibiotics and antifungals. Extent varies by drug.', implication:'If on Oxiris: monitor drug levels more aggressively, especially antifungals.' },
+        ],
+        rhabdo: [
+            { trial:'Rhabdomyolysis CRRT review', year:2024, n:null, grade:'LOW', finding:'Standard CRRT controls K\u207A/acid-base effectively. Myoglobin clearance modest with conventional membranes; high-cutoff filters may help.', implication:'Standard dose for metabolic control. Membrane choice > dose escalation for myoglobin.' },
+        ],
+        tls: [
+            { trial:'TLS CRRT evidence', year:2024, n:null, grade:'LOW', finding:'CRRT effective for refractory TLS. No dose-finding trials. Monitor PO\u2084, K\u207A, uric acid, Ca\u00B2\u207A Q4\u20136h.', implication:'Standard CRRT dose. Monitor aggressively. Escalate only if metabolic control inadequate.' },
+        ],
+        ckd: [
+            { trial:'CKD-on-AKI timing (Q9.1)', year:2024, n:null, grade:'LOW', finding:'CKD patients may benefit from earlier RRT initiation. CRRT may preserve residual function better than IHD.', implication:'Lower threshold for starting in CKD-on-AKI. Consider CRRT over IHD if residual function matters.' },
+        ],
+    };
+
+    /**
+     * Ring 3: Render compact inline evidence card for a given domain
+     * @param {string} domainKey - key from evidenceDB
+     * @param {string} [label] - optional custom label
+     * @returns {string} HTML string
+     */
+    function renderEvidenceCards(domainKey, label) {
+        const trials = evidenceDB[domainKey];
+        if (!trials || trials.length === 0) return '';
+        const domainLabel = label || domainKey.charAt(0).toUpperCase() + domainKey.slice(1);
+        const toggleId = 'evi_' + domainKey + '_' + Math.random().toString(36).substr(2,5);
+
+        let html = `<div class="evidence-inline">`;
+        html += `<span class="evidence-inline-toggle" onclick="var b=document.getElementById('${toggleId}');b.classList.toggle('open');this.querySelector('.evi-arrow').textContent=b.classList.contains('open')?'\u25B2':'\u25BC';">`;
+        html += `\uD83D\uDCDA ${domainLabel} Evidence (${trials.length}) <span style="font-size:9px;color:#64748b;margin-left:4px;">Updated ${EVIDENCE_UPDATED}</span> <span class="evi-arrow">\u25BC</span></span>`;
+        html += `<div class="evidence-inline-body" id="${toggleId}">`;
+
+        trials.forEach(t => {
+            const gc = t.grade === 'HIGH' ? 'grade-high' : t.grade === 'MODERATE' ? 'grade-moderate' : t.grade === 'LOW' ? 'grade-low' : 'grade-verylow';
+            html += `<div class="evi-row">`;
+            html += `<div><span class="evi-trial">${t.trial}</span> ${t.year ? '(' + t.year + ')' : ''} ${t.n ? '<span class="evidence-pill">N=' + t.n.toLocaleString() + '</span>' : ''} <span class="grade-badge ${gc}">${t.grade}</span>`;
+            html += `<div class="evi-finding">${t.finding}</div>`;
+            html += `<div class="evi-implication">\u2192 ${t.implication}</div>`;
+            html += `</div></div>`;
+        });
+
+        html += `</div></div>`;
+        return html;
+    }
+
+    function generatePrescription() {
+        // Hide steps, show output
+        document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+        document.getElementById('outputPanel').classList.add('active');
+
+        // Mark all progress done
+        document.querySelectorAll('.progress-step').forEach(s => s.classList.add('done'));
+        document.querySelectorAll('.progress-step').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.progress-line').forEach(l => l.classList.add('done'));
+
+        // === CLINICAL CONTEXT FLAGS ===
+        const hasEmergency = ['refractory-k', 'severe-acidosis', 'pulm-edema', 'uraemic', 'toxin']
+            .some(e => selections.indication.has(e));
+        const isDistributive = selections.haemo === 'unstable-distributive';
+        const isCardiogenic = selections.haemo === 'unstable-cardiogenic';
+        const highBleed = selections.bleeding === 'high' || (v13 && v13.bleeding === 'high');
+        const isHIT = selections.bleeding === 'hit' || (v13 && v13.bleeding === 'hit');
+        const liverFail = selections.bleeding === 'liver-failure' || (v13 && v13.liver === 'failing');
+        const liverImpaired = v13 && v13.liver === 'impaired';
+        const hasBrainInjury = selections.context.has('brain-injury');
+        const hasECMO = selections.context.has('ecmo');
+        const hasRhabdo = selections.context.has('rhabdo');
+        const hasTLS = selections.context.has('tls');
+        const hasCircuitIssues = selections.context.has('circuit-issues');
+        const hasDysnatemia = selections.context.has('dysnatemia');
+
+        // === WEIGHT ===
+        const weight = selections.exactWeight || (selections.weight === 'lt60' ? 55 : selections.weight === '60-75' ? 67 : 85);
+        const weightCat = weight < 60 ? 'low' : (weight > 75 ? 'high' : 'mid');
+
+        // === MODALITY LOGIC ===
+        let modality = 'CVVHDF';
+        let modalityReason = 'Default: balanced convective + diffusive clearance';
+
+        // Priority 1: High solute load → CVVHDF (need both mechanisms)
+        if (selections.indication.has('toxin') || hasTLS || hasRhabdo) {
+            modality = 'CVVHDF';
+            modalityReason = 'High solute load \u2192 combination modality for maximum clearance';
+        }
+        // Priority 2: Isolated volume → SCUF
+        else if (selections.indication.has('volume') && selections.indication.size === 1) {
+            modality = 'SCUF';
+            modalityReason = 'Isolated volume management \u2192 slow continuous ultrafiltration';
+            if (isCardiogenic) modalityReason += ' (preferred in cardiogenic shock)';
+        }
+        // Priority 3: Volume + general clearance (no K+/electrolyte-specific) → CVVH
+        else if (selections.indication.has('volume') &&
+                 (selections.indication.has('solute-clearance') || selections.indication.has('acidosis-correction')) &&
+                 !selections.indication.has('electrolyte') &&
+                 !selections.indication.has('refractory-k')) {
+            modality = 'CVVH';
+            modalityReason = 'Volume removal + general clearance goals \u2192 CVVH (convection-based). Effective for medium molecules. No dialysate component.';
+            // Caveat: CVVH citrate should avoid K+ >5.5 (no dialysate for K+ clearance)
+        }
+        // Priority 4: Distributive shock + electrolyte → CVVHD
+        else if (isDistributive && selections.indication.has('electrolyte')) {
+            modality = 'CVVHD';
+            modalityReason = 'Septic shock + electrolyte goals \u2192 diffusive clearance, less haemodynamic impact';
+        }
+        // Priority 5: Electrolyte-only or K+/Na+ specific → CVVHD
+        else if (selections.indication.has('electrolyte') && selections.indication.size === 1) {
+            modality = 'CVVHD';
+            modalityReason = 'Isolated electrolyte management \u2192 diffusion most efficient for small molecules (K\u207A, Na\u207A, urea)';
+        }
+        // Default: CVVHDF
+
+        // === ANTICOAGULATION LOGIC ===
+        let anticoag = 'Regional Citrate (RCA)';
+        let anticoagShort = 'citrate';
+        let anticoagReason = 'First-line per KDIGO. Longer circuit life, no systemic anticoagulation.';
+        let anticoagMonitoring = '';
+
+        if (highBleed && liverFail) {
+            anticoag = 'No Anticoagulation';
+            anticoagShort = 'none';
+            anticoagReason = 'High bleeding risk + liver failure with lactic acidosis: citrate accumulation risk too high. Use replacement-dominant protocol (70% pre-dilution) to maximise circuit life.';
+            anticoagMonitoring = 'Circuit pressures hourly. Expect 12\u201318h circuit life. High pre-filter replacement. Monitor TMP trend.';
+        } else if (liverFail) {
+            anticoag = 'Regional Citrate \u2013 ENHANCED MONITORING';
+            anticoagShort = 'citrate';
+            anticoagReason = 'Liver failure: citrate metabolism impaired but NOT an absolute contraindication (accumulation ~12% with protocolised care). Monitor total:ionised Ca\u00B2\u207A ratio Q4h. The real danger is shock + persistent lactic acidosis, not liver dysfunction alone.';
+            anticoagMonitoring = 'tCa/iCa ratio Q4h: \u22652.1 = early alarm (increase monitoring), \u22652.5 = critical (switch to no anticoag). Lactate kinetics: non-clearing lactate >3.4 mmol/L over 6\u201312h is a stronger predictor than single values.';
+        } else if (isHIT) {
+            anticoag = 'Argatroban or Regional Citrate';
+            anticoagShort = 'citrate';
+            anticoagReason = 'HIT: all heparin products contraindicated. RCA preferred if available, argatroban if not.';
+            anticoagMonitoring = 'If argatroban: APTT Q4h (target 1.5\u20133.0\u00D7 baseline). Avoid heparin flushes.';
+        } else if (highBleed) {
+            anticoag = 'Regional Citrate (preferred) or None';
+            anticoagShort = 'citrate';
+            anticoagReason = 'High bleeding risk: RCA avoids systemic anticoagulation. Accept shorter filter life if no anticoag used.';
+            anticoagMonitoring = 'Monitor circuit pressures hourly. If no anticoag: expect 12\u201324h circuit life.';
+        } else if (selections.bleeding === 'moderate') {
+            anticoag = 'Regional Citrate (RCA)';
+            anticoagShort = 'citrate';
+            anticoagReason = 'Moderate bleeding risk: citrate preferred (no systemic effect). Monitor coagulation status closely.';
+            anticoagMonitoring = 'Check Hb, coags Q8h. Monitor for clinical bleeding. Circuit life assessment Q12h.';
+        } else if (hasECMO) {
+            anticoag = 'Systemic Heparin (shared with ECMO circuit)';
+            anticoagShort = 'heparin';
+            anticoagReason = 'ECMO already requires systemic heparin. Avoid additional citrate complexity.';
+            anticoagMonitoring = 'APTT per ECMO protocol. Monitor anti-Xa if available.';
+        }
+
+        // Mixed shock additional context
+        const isMixed = selections.haemo === 'mixed';
+
+        // =====================================================
+        // MICU v6 PROTOCOL LOOKUP TABLES
+        // Anticoag-specific & weight-category-specific rates
+        // Ported from dosing_adjustment.html
+        // =====================================================
+
+        let bloodFlow = 150;
+        let dialysate = 0, replacement = 0;
+        let preFilterReplacement = 0, postFilterReplacement = 0;
+        let protocolNote = '';
+        let dialysateFluid = '';
+        let replacementFluid = '';
+        let replacementPosition = '';
+        let filterType = 'M100 (default)';
+
+        // Regiocit flow tracking (for citrate protocols)
+        let regiocitFlow = 0; // ml/hr — machine-controlled pre-blood-pump
+        const CITRATE_DOSE = 2.5; // mmol/L target in blood
+        const REGIOCIT_CONC = 18; // mmol/L citrate in Regiocit solution
+
+        if (modality === 'CVVHDF') {
+            if (anticoagShort === 'citrate') {
+                // CVVHDF + CITRATE (Regiocit)
+                bloodFlow = 150;
+                // Regiocit flow = Qb(ml/min) × 60 × citrateDose / regiocitConc
+                regiocitFlow = Math.round(bloodFlow * 60 * CITRATE_DOSE / REGIOCIT_CONC);
+                postFilterReplacement = 50; // MgSO4 in NS
+                replacement = postFilterReplacement;
+                dialysate = weightCat === 'low' ? 500 : (weightCat === 'mid' ? 1000 : 1500);
+                dialysateFluid = 'Biphozyl';
+                replacementFluid = 'MgSO\u2084 in NS';
+                replacementPosition = 'post-filter';
+                protocolNote = `Citrate (Regiocit) protocol: Regiocit ~${regiocitFlow} ml/hr pre-blood-pump (machine-controlled at citrate dose ${CITRATE_DOSE} mmol/L). Ca compensation 110-120%.`;
+            } else if (anticoagShort === 'heparin') {
+                // CVVHDF + HEPARIN
+                bloodFlow = weightCat === 'high' ? 250 : 200;
+                preFilterReplacement = weightCat === 'low' ? 1000 : (weightCat === 'mid' ? 1250 : 1500);
+                replacement = preFilterReplacement;
+                dialysate = weightCat === 'low' ? 500 : 1000;
+                dialysateFluid = 'Prismasol';
+                replacementFluid = 'Prismasol';
+                replacementPosition = 'pre-filter';
+                protocolNote = 'Heparin protocol: Heparin 5 units/kg/hr (target APTT ratio 1.5-2.0 or anti-Xa 0.3-0.5). Pre-filter replacement for additional circuit protection.';
+            } else {
+                // CVVHDF + NO ANTICOAG
+                bloodFlow = weightCat === 'high' ? 250 : 200;
+                preFilterReplacement = weightCat === 'low' ? 1250 : (weightCat === 'mid' ? 1500 : 2000);
+                replacement = preFilterReplacement;
+                dialysate = weightCat === 'low' ? 500 : 1000;
+                dialysateFluid = 'Prismasol';
+                replacementFluid = 'Prismasol';
+                replacementPosition = 'pre-filter';
+                protocolNote = 'No anticoag protocol: High pre-filter replacement to reduce filtration fraction and extend circuit life. Higher blood flow (200-250 ml/min) for circuit longevity.';
+            }
+        } else if (modality === 'CVVH') {
+            if (anticoagShort === 'citrate') {
+                // CVVH + CITRATE — No dialysate. Replacement post-filter (Biphozyl).
+                // Caution: Avoid if K+ >5.5 (no dialysate for K+ clearance)
+                bloodFlow = weightCat === 'high' ? 150 : 120;
+                regiocitFlow = Math.round(bloodFlow * 60 * CITRATE_DOSE / REGIOCIT_CONC);
+                replacement = weightCat === 'low' ? 500 : (weightCat === 'mid' ? 1000 : 1250);
+                postFilterReplacement = replacement;
+                dialysateFluid = '';
+                replacementFluid = 'Biphozyl';
+                replacementPosition = 'post-filter';
+                protocolNote = `CVVH Citrate: Convection only, no dialysate. Regiocit ~${regiocitFlow} ml/hr pre-BP machine-controlled. \u26A0\uFE0F Avoid if K\u207A >5.5 mmol/L (no dialysate for K\u207A clearance).`;
+            } else if (anticoagShort === 'heparin') {
+                // CVVH + HEPARIN — Total replacement split 65% pre / 35% post
+                bloodFlow = weightCat === 'high' ? 250 : 200;
+                const totalRepl = weightCat === 'low' ? 1750 : (weightCat === 'mid' ? 2500 : 3000);
+                preFilterReplacement = Math.round(totalRepl * 0.65);
+                postFilterReplacement = Math.round(totalRepl * 0.35);
+                replacement = totalRepl;
+                replacementFluid = 'Prismasol';
+                replacementPosition = '65% pre / 35% post';
+                protocolNote = 'CVVH Heparin: Convection only. Replacement split 65% pre-filter / 35% post-filter. Heparin 5 units/kg/hr (target APTT <60s).';
+            } else {
+                // CVVH + NO ANTICOAG — Higher pre-filter fraction (70/30)
+                bloodFlow = weightCat === 'high' ? 250 : 200;
+                const totalRepl = weightCat === 'low' ? 1750 : (weightCat === 'mid' ? 2500 : 3000);
+                preFilterReplacement = Math.round(totalRepl * 0.70);
+                postFilterReplacement = Math.round(totalRepl * 0.30);
+                replacement = totalRepl;
+                replacementFluid = 'Prismasol';
+                replacementPosition = '70% pre / 30% post';
+                protocolNote = 'CVVH No Anticoag: Higher pre-filter fraction (70%) to maximise circuit protection without anticoagulation.';
+            }
+        } else if (modality === 'CVVHD') {
+            bloodFlow = 150;
+            dialysate = weightCat === 'low' ? 500 : (weightCat === 'mid' ? 1000 : 1500);
+            dialysateFluid = anticoagShort === 'citrate' ? 'Biphozyl' : 'Prismasol';
+            protocolNote = 'CVVHD: Pure diffusion. Most efficient for small molecules (K\u207A, urea). Consider for isolated hyperkalaemia or dysnatraemia.';
+        } else if (modality === 'SCUF') {
+            bloodFlow = 100;
+            protocolNote = 'SCUF: Pure ultrafiltration. No solute clearance. For isolated volume overload only.';
+        }
+
+        // Filter selection (institution: Oxiris + M100 only)
+        // Dr. CMY consultation: Oxiris "star patient" = hyperinflammatory septic shock
+        // Criteria: refractory vasopressor + Gram-negative/abdominal source + high inflammatory markers
+        // Current limitation: 5-tap flow captures haemo state + sepsis context, not vasopressor dose
+        let filterReason = '';
+        const hasSepsis = selections.context.has('sepsis') || isDistributive;
+        if (hasDysnatemia) {
+            filterType = 'Oxiris';
+            filterReason = 'Dysnatraemia context: Oxiris membrane selected per institutional protocol.';
+        } else if (isDistributive && selections.context.has('sepsis')) {
+            // Strong signal: both distributive shock AND sepsis flagged
+            filterType = 'Oxiris (adsorptive)';
+            filterReason = 'Septic shock with haemodynamic instability: Oxiris recommended. Meta-analysis (14 studies, n=695): lower 28-day mortality (OR 0.53), faster vasopressor weaning. Strongest signal in abdominal/Gram-negative sepsis. Evaluate efficacy at 72h (APAC Consensus 2024): look for vasopressor reduction and lactate clearance.';
+        } else if (isDistributive) {
+            // Distributive shock alone (may be septic) — suggest Oxiris with less certainty
+            filterType = 'Oxiris (adsorptive)';
+            filterReason = 'Distributive shock: Oxiris membrane for cytokine/endotoxin adsorption. Consider especially if abdominal/urinary source, high-dose vasopressors (NorA >0.5 mcg/kg/min), or elevated inflammatory markers. Evaluate efficacy at 72h.';
+        } else if (selections.context.has('sepsis')) {
+            // Sepsis flagged but haemodynamically not in distributive shock
+            filterType = 'Oxiris (adsorptive)';
+            filterReason = 'Sepsis context: Oxiris for cytokine adsorption. Strongest evidence in refractory septic shock with abdominal/Gram-negative source. If haemodynamically stable, M100 is also reasonable.';
+        } else {
+            filterType = 'M100';
+            filterReason = 'Standard AN69 membrane. No sepsis/adsorption indication.';
+        }
+
+        // === DOSE CALCULATION ===
+        // Include Regiocit pre-pump flow in effluent (it contributes to clearance)
+        const totalEffluent = dialysate + replacement + regiocitFlow;
+        let prescribedDose = weight > 0 ? Math.round(totalEffluent / weight * 10) / 10 : 35;
+
+        // Override for special contexts
+        if (hasTLS || hasRhabdo) {
+            prescribedDose = Math.max(prescribedDose, 40);
+        } else if (isCardiogenic) {
+            prescribedDose = Math.min(prescribedDose, 30);
+        }
+
+        // Recalculate absolute rates if dose was overridden
+        let actualDialysate = dialysate;
+        let actualReplacement = replacement;
+        let actualPreFilter = preFilterReplacement;
+        let actualPostFilter = postFilterReplacement;
+        let actualTotalEffluent = totalEffluent; // includes regiocitFlow
+
+        const defaultDose = weight > 0 ? Math.round(totalEffluent / weight * 10) / 10 : 35;
+        if (prescribedDose !== defaultDose && totalEffluent > 0) {
+            const scaleFactor = (prescribedDose * weight) / totalEffluent;
+            actualDialysate = Math.round(dialysate * scaleFactor);
+            actualReplacement = Math.round(replacement * scaleFactor);
+            actualPreFilter = Math.round(preFilterReplacement * scaleFactor);
+            actualPostFilter = Math.round(postFilterReplacement * scaleFactor);
+            // Regiocit is machine-controlled and doesn't scale — only dialysate/replacement scale
+            actualTotalEffluent = actualDialysate + actualReplacement + regiocitFlow;
+        }
+
+        // Context-dependent efficiency factor (must be before deliveredEstimate calculation)
+        let efficiencyFactor = 0.72; // Default: 72% (RENAL/ATN evidence)
+        let efficiencyNote = 'Standard estimate (RENAL/ATN: 60\u201375%)';
+        if (anticoagShort !== 'citrate' && anticoagShort !== 'heparin') {
+            efficiencyFactor = 0.60; // No anticoag = more circuit clotting = lower efficiency
+            efficiencyNote = 'Lower efficiency expected: no anticoagulation \u2192 shorter circuit life, more downtime';
+        } else if (hasCircuitIssues) {
+            efficiencyFactor = 0.55;
+            efficiencyNote = 'Reduced efficiency: recurrent circuit clotting \u2192 significant downtime expected';
+        }
+
+        const deliveredEstimate = Math.round(prescribedDose * efficiencyFactor);
+        let doseReason = `Standard ${prescribedDose} ml/kg/hr prescribed \u2192 ~${deliveredEstimate} ml/kg/hr delivered (${efficiencyNote})`;
+
+        if (hasTLS || hasRhabdo) {
+            doseReason = 'High solute load \u2192 higher prescribed dose. Monitor delivered dose closely.';
+        } else if (isCardiogenic) {
+            doseReason = 'Cardiogenic shock \u2192 conservative dosing. Prioritise haemodynamic stability over clearance.';
+        }
+
+        // Dialysate:replacement:regiocit ratio
+        const dialysatePercent = actualTotalEffluent > 0 ? Math.round(actualDialysate / actualTotalEffluent * 100) : 0;
+        const replacementPercent = actualTotalEffluent > 0 ? Math.round(actualReplacement / actualTotalEffluent * 100) : 0;
+        const regiocitPercent = actualTotalEffluent > 0 ? Math.round(regiocitFlow / actualTotalEffluent * 100) : 0;
+
+        // === UF RATE ===
+        let ufRate = '50\u2013100 ml/hr';
+        let ufReason = 'Standard gentle UF';
+        let ufCategory = 'moderate';
+
+        if (isCardiogenic) {
+            ufRate = '25\u201350 ml/hr (MAX)';
+            ufReason = 'Cardiogenic shock: very cautious fluid removal. Reassess MAP/CO continuously.';
+            ufCategory = 'conservative';
+        } else if (isDistributive) {
+            ufRate = '0\u201350 ml/hr initially';
+            ufReason = 'Active distributive shock: may not tolerate net UF. Prioritise clearance over fluid removal.';
+            ufCategory = 'conservative';
+        } else if (isMixed) {
+            ufRate = '0\u201375 ml/hr';
+            ufReason = 'Mixed/evolving shock: conservative approach. Haemodynamics unpredictable \u2192 reassess Q2\u20134h. Titrate UF based on response.';
+            ufCategory = 'conservative';
+        } else if (selections.indication.has('pulm-edema')) {
+            ufRate = '100\u2013200 ml/hr';
+            ufReason = 'Pulmonary oedema: more aggressive UF tolerated if MAP maintained.';
+            ufCategory = 'liberal';
+        }
+
+        // FIX #6: Override for pulmonary oedema even in shock (if clinically indicated)
+        if (selections.indication.has('pulm-edema') && (isDistributive || isMixed)) {
+            ufRate = '50\u2013100 ml/hr (cautious)';
+            ufReason = 'Pulmonary oedema WITH haemodynamic instability: balance oxygenation vs perfusion. Start low, titrate up if tolerated. Consider vasopressor optimisation first.';
+            ufCategory = 'moderate';
+        }
+
+        // Delivered dose status
+        let deliveredStatus = 'optimal';
+        let deliveredStatusText = 'Within target range (20\u201325)';
+        if (deliveredEstimate < 20) {
+            deliveredStatus = 'low';
+            deliveredStatusText = 'Below evidence-based target';
+        } else if (deliveredEstimate > 25 && deliveredEstimate <= 30) {
+            deliveredStatus = 'suboptimal';
+            deliveredStatusText = 'Above standard target \u2013 no proven benefit';
+        } else if (deliveredEstimate > 30) {
+            deliveredStatus = 'low';
+            deliveredStatusText = 'High dose \u2013 IVOIRE showed no benefit';
+        }
+
+        // =====================================================
+        // RENDER OUTPUT
+        // =====================================================
+
+        // Summary strip
+        const summaryStrip = document.getElementById('summaryStrip');
+        summaryStrip.innerHTML = '';
+
+        const labels = {
+            'refractory-k': ['\uD83D\uDEA8 Refractory K\u207A', 'danger'],
+            'severe-acidosis': ['\uD83D\uDEA8 Severe Acidosis', 'danger'],
+            'pulm-edema': ['\uD83D\uDEA8 Pulm Oedema', 'danger'],
+            'uraemic': ['\uD83D\uDEA8 Uraemic', 'danger'],
+            'toxin': ['\uD83D\uDEA8 Toxin Removal', 'danger'],
+            'volume': ['\uD83D\uDCA7 Volume Mgmt', ''],
+            'acidosis-correction': ['\u2697\uFE0F Acidosis Rx', ''],
+            'electrolyte': ['\uD83E\uDDEA Electrolyte', ''],
+            'solute-clearance': ['\uD83D\uDD2C Solute Clearance', ''],
+            'brain-injury': ['\uD83E\uDDE0 Brain Injury', 'warning'],
+            'ecmo': ['\uD83D\uDD04 ECMO', 'warning'],
+            'post-cardiac': ['\uD83E\uDEC0 Post-Cardiac', ''],
+            'rhabdo': ['\uD83D\uDCAA Rhabdomyolysis', 'warning'],
+            'tls': ['\uD83E\uDDEC TLS', 'warning'],
+            'dysnatemia': ['\uD83E\uDDEA Dysnatraemia', 'warning'],
+            'pregnancy': ['\uD83E\uDD30 Pregnancy', ''],
+            'circuit-issues': ['\uD83D\uDD04 Circuit Issues', 'warning']
+        };
+
+        selections.indication.forEach(v => {
+            const [text, cls] = labels[v] || [v, ''];
+            summaryStrip.innerHTML += `<span class="summary-tag ${cls}">${text}</span>`;
+        });
+        selections.context.forEach(v => {
+            const [text, cls] = labels[v] || [v, ''];
+            summaryStrip.innerHTML += `<span class="summary-tag ${cls}">${text}</span>`;
+        });
+
+        // Title
+        const weightBandLabel = weightCat === 'low' ? '<60 kg band' : (weightCat === 'high' ? '>75 kg band' : '60\u201375 kg band');
+        document.getElementById('rxTitle').textContent = `${modality} \u2013 ${anticoag}`;
+        document.getElementById('rxSubtitle').textContent = `Generated from ${selections.indication.size} indication(s) \u2022 ${weight} kg (${weightBandLabel}) \u2022 ${hasEmergency ? 'URGENT' : 'Standard'} priority`;
+
+        // >100kg warning
+        if (weight > 100) {
+            document.getElementById('summaryStrip').innerHTML += `<span class="summary-tag warning">\u26A0\uFE0F >100 kg \u2013 protocol designed for \u2264100 kg, customised Rx may be needed</span>`;
+        }
+
+        // === SETTINGS GRID (matching dosing_adjustment.html) ===
+        const grid = document.getElementById('settingsGrid');
+        let gridHTML = `
+            <div class="setting-item">
+                <div class="setting-label">Mode</div>
+                <div class="setting-value" style="font-size: 14px;">${modality}</div>
+                <div class="setting-why">Based on goals</div>
+            </div>
+            <div class="setting-item">
+                <div class="setting-label">Blood Flow</div>
+                <div class="setting-value">${bloodFlow} <span class="setting-unit">ml/min</span></div>
+                <div class="setting-why">${anticoagShort === 'citrate' ? 'Fixed (citrate)' : 'Higher Qb \u2192 circuit life'}</div>
+            </div>`;
+
+        if (actualDialysate > 0) {
+            gridHTML += `
+            <div class="setting-item">
+                <div class="setting-label">Dialysate${dialysateFluid ? ' (' + dialysateFluid + ')' : ''}</div>
+                <div class="setting-value">${actualDialysate} <span class="setting-unit">ml/hr</span></div>
+                <div class="setting-why">Diffusion${dialysatePercent ? ' \u2022 ' + dialysatePercent + '% of effluent' : ''}</div>
+            </div>`;
+        }
+
+        if (regiocitFlow > 0) {
+            gridHTML += `
+            <div class="setting-item">
+                <div class="setting-label">Regiocit (pre-pump)</div>
+                <div class="setting-value">~${regiocitFlow} <span class="setting-unit">ml/hr</span></div>
+                <div class="setting-why">Machine-controlled \u2022 citrate ${CITRATE_DOSE} mmol/L</div>
+            </div>`;
+        }
+
+        if (actualReplacement > 0) {
+            gridHTML += `
+            <div class="setting-item">
+                <div class="setting-label">Replacement${replacementFluid ? ' (' + replacementFluid + ')' : ''}</div>
+                <div class="setting-value">${actualReplacement} <span class="setting-unit">ml/hr</span></div>
+                <div class="setting-why">${replacementPosition || 'Convection'}${replacementPercent ? ' \u2022 ' + replacementPercent + '% of effluent' : ''}</div>
+            </div>`;
+        }
+
+        if (actualPreFilter > 0 && actualPostFilter > 0) {
+            gridHTML += `
+            <div class="setting-item span-2">
+                <div class="setting-label">Replacement Split</div>
+                <div class="setting-value" style="font-size: 12px;">Pre: ${actualPreFilter} ml/hr | Post: ${actualPostFilter} ml/hr</div>
+                <div class="setting-why">${replacementPosition}</div>
+            </div>`;
+        }
+
+        gridHTML += `
+            <div class="setting-item">
+                <div class="setting-label">Net UF Rate</div>
+                <div class="setting-value" style="font-size: 13px;">${ufRate}</div>
+                <div class="setting-why">${ufCategory}</div>
+            </div>
+            <div class="setting-item">
+                <div class="setting-label">Prescribed Dose</div>
+                <div class="setting-value">${prescribedDose} <span class="setting-unit">ml/kg/hr</span></div>
+            </div>
+            <div class="setting-item">
+                <div class="setting-label">Expected Delivered</div>
+                <div class="setting-value">~${deliveredEstimate} <span class="setting-unit">ml/kg/hr</span></div>
+                <div class="setting-why">${Math.round(efficiencyFactor * 100)}% efficiency</div>
+            </div>
+            <div class="setting-item">
+                <div class="setting-label">Filter</div>
+                <div class="setting-value" style="font-size: 11px;">${filterType}</div>
+            </div>`;
+
+        grid.innerHTML = gridHTML;
+
+        // Protocol note
+        document.getElementById('protocolNote').innerHTML = protocolNote ?
+            `<div class="protocol-note"><strong>\uD83D\uDCCB Protocol basis:</strong> ${protocolNote}</div>` : '';
+
+        // === CITRATE SECTION ===
+        const citrateSec = document.getElementById('citrateSection');
+        if (anticoagShort === 'citrate') {
+            const caInfusion = '10\u201320'; // Starting range, titrate to systemic iCa
+            citrateSec.innerHTML = `
+                <div class="citrate-section">
+                    <h3>\uD83D\uDED1 Citrate Protocol (Regiocit)</h3>
+                    <div class="detail">
+                        <strong>Starting rates:</strong><br>
+                        \u2022 Regiocit: ~${regiocitFlow} ml/hr pre-blood-pump (machine-controlled at citrate dose ${CITRATE_DOSE} mmol/L)<br>
+                        \u2022 Calcium gluconate 10% infusion: ${caInfusion} ml/hr (titrate to systemic iCa)<br>
+                        \u2022 NaHCO\u2083 8.45%: 0 / 25 / 50 ml/hr (target pH 7.25\u20137.45)<br><br>
+                        <strong>Monitoring targets:</strong><br>
+                        \u2022 Post-filter iCa: 0.25\u20130.35 mmol/L (circuit anticoagulation)<br>
+                        \u2022 Systemic iCa: 1.0\u20131.2 mmol/L<br>
+                        \u2022 Total Ca:iCa ratio: &lt;2.5 (citrate accumulation marker)<br>
+                        \u2022 Check iCa 1h post-start, then Q6h when stable
+                        ${liverFail ? '<br><br><strong>\u26A0\uFE0F Liver Failure (NOT absolute contraindication):</strong> Impaired citrate metabolism but accumulation only ~12% with protocolised care. Monitor tCa:iCa ratio Q4h. Thresholds: \u22652.1 = early alarm (increase monitoring to Q2h), \u22652.5 = critical (switch to no anticoagulation). Watch lactate kinetics: non-clearing lactate over 6\u201312h is a stronger predictor than liver function tests alone.' : ''}
+                    </div>
+                </div>`;
+        } else {
+            citrateSec.innerHTML = '';
+        }
+
+        // Ring 3: Anticoagulation evidence cards
+        document.getElementById('anticoagEvidence').innerHTML = renderEvidenceCards('anticoag', 'Anticoagulation');
+
+        // === DOSE TRANSPARENCY SECTION ===
+        let doseBreakdownHTML = '';
+        if (regiocitFlow > 0) {
+            doseBreakdownHTML = `
+                    <div style="font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 6px;">Effluent Breakdown (Citrate Protocol)</div>
+                    <div class="formula">
+                        Total Effluent = Regiocit + Dialysate + Replacement<br>
+                        <strong>${actualTotalEffluent} ml/hr</strong> = ${regiocitFlow} (Regiocit) + ${actualDialysate} (Biphozyl) + ${actualReplacement} (MgSO\u2084)<br><br>
+                        Prescribed Dose = Total Effluent \u00F7 Weight<br>
+                        <strong>${prescribedDose} ml/kg/hr</strong> = ${actualTotalEffluent} \u00F7 ${weight} kg
+                    </div>
+                    <div class="explanation">
+                        <strong>Why Regiocit is included:</strong> Regiocit (~${regiocitFlow} ml/hr) runs pre-blood-pump and contributes to solute clearance.
+                        It accounts for ~${regiocitPercent}% of total effluent. The MICU v6 protocol dose ranges (>30 ml/kg/hr) include this flow.
+                    </div>`;
+        } else {
+            doseBreakdownHTML = `
+                    <div style="font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 6px;">Effluent Breakdown</div>
+                    <div class="formula">
+                        Total Effluent = Dialysate + Replacement<br>
+                        <strong>${actualTotalEffluent} ml/hr</strong> = ${actualDialysate} + ${actualReplacement}<br><br>
+                        Prescribed Dose = Total Effluent \u00F7 Weight<br>
+                        <strong>${prescribedDose} ml/kg/hr</strong> = ${actualTotalEffluent} \u00F7 ${weight} kg
+                    </div>`;
+        }
+
+        document.getElementById('doseSection').innerHTML = `
+            <div class="dose-section">
+                <h3>\uD83D\uDC8A Dose Personalisation</h3>
+                <div class="dose-transparency-box">
+                    ${doseBreakdownHTML}
+                </div>
+
+                <div class="dose-transparency-box" style="margin-top: 10px;">
+                    <div style="font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 6px;">\uD83D\uDD0D Prescribed vs Delivered</div>
+                    <div class="formula">
+                        Target Delivered = Prescribed \u00D7 Efficiency Factor<br>
+                        <strong>${deliveredEstimate} ml/kg/hr</strong> = ${prescribedDose} \u00D7 ${Math.round(efficiencyFactor * 100)}%
+                    </div>
+                    <div class="explanation">
+                        <strong>Evidence basis:</strong> RENAL/ATN trials prescribed 35\u201340 ml/kg/hr but achieved
+                        only 20\u201325 ml/kg/hr delivered (${Math.round(efficiencyFactor * 100)}% efficiency due to circuit downtime, clotting, procedures).
+                    </div>
+                </div>
+
+                <div class="dose-live-calc">
+                    <div class="dose-live-box">
+                        <div class="dose-live-label">Prescribed</div>
+                        <div class="dose-live-value prescribed">${prescribedDose}<span class="dose-unit"> ml/kg/hr</span></div>
+                        <div style="font-size: 9px; color: var(--text-light);">What you order</div>
+                    </div>
+                    <div class="dose-arrow">\u2192</div>
+                    <div class="dose-live-box">
+                        <div class="dose-live-label">Expected Delivered</div>
+                        <div class="dose-live-value delivered ${deliveredStatus === 'suboptimal' ? 'warning-val' : deliveredStatus === 'low' ? 'danger-val' : ''}">${deliveredEstimate}<span class="dose-unit"> ml/kg/hr</span></div>
+                        <div class="dose-status-badge ${deliveredStatus}">${deliveredStatusText}</div>
+                    </div>
+                </div>
+            </div>`;
+
+        // Ring 3: Dose evidence cards
+        document.getElementById('doseEvidence').innerHTML = renderEvidenceCards('dose', 'Dose');
+
+        // === UF SECTION ===
+        document.getElementById('ufSection').innerHTML = `
+            <div class="uf-section ${ufCategory}">
+                <h3>\uD83D\uDCA7 UF Rate: ${ufCategory.toUpperCase()}</h3>
+                <div class="detail">
+                    <strong>Recommended: ${ufRate}</strong><br><br>
+                    <strong>Clinical Rationale:</strong> ${ufReason}
+                </div>
+            </div>`;
+
+        // Ring 3: UF evidence cards
+        document.getElementById('ufEvidence').innerHTML = renderEvidenceCards('uf', 'Fluid Removal');
+
+        // === MONITORING SECTION ===
+        let monitorItems = [];
+        
+        // Core labs — always
+        monitorItems.push({
+            title: '\uD83E\uDDEA Core Labs',
+            items: [
+                'ABG + iCa: 1h post-start, then Q6h when stable',
+                'UEC (Na\u207A, K\u207A, Cl\u207B, HCO\u2083\u207B, urea, creatinine): Q6\u20138h',
+                'Mg\u00B2\u207A, PO\u2084\u00B3\u207B: Q12h (replete aggressively)',
+                'FBC: Daily (watch platelets for HIT screening)'
+            ]
+        });
+
+        // Anticoag-specific monitoring
+        if (anticoagShort === 'citrate') {
+            const citrateItems = [
+                'Post-filter iCa: target 0.25\u20130.35 mmol/L (Q1h \u00D72, then Q6h)',
+                'Systemic iCa: target 1.0\u20131.2 mmol/L',
+                'tCa:iCa ratio thresholds: <2.1 normal | \u22652.1 EARLY ALARM (increase frequency) | \u22652.5 CRITICAL (stop citrate)',
+                'Lactate kinetics: NON-CLEARING lactate over 6\u201312h is more predictive of citrate accumulation than a single value. Lactate \u22653.4 mmol/L predicts accumulation (sens/spec ~86%).'
+            ];
+            monitorItems.push({
+                title: '\uD83D\uDED1 Citrate Monitoring',
+                items: citrateItems
+            });
+
+            // Build 3: Enhanced monitoring protocol for liver failure + citrate
+            if (liverFail) {
+                monitorItems.push({
+                    title: '\u26A0\uFE0F Enhanced Citrate Monitoring \u2014 Liver Failure',
+                    items: [
+                        'FREQUENCY ESCALATION: tCa:iCa ratio Q4h baseline (not Q8h). Escalate to Q2h if ratio \u22652.1.',
+                        'LIVER FAILURE IS NOT AN ABSOLUTE CONTRAINDICATION: Accumulation occurs in only ~12% with protocolised monitoring (Q3.3 evidence).',
+                        'THE REAL DANGER: Shock + persistent lactic acidosis, not liver dysfunction alone. A patient with stable liver failure and clearing lactate can tolerate citrate safely.',
+                        'LACTATE KINETICS PROTOCOL: Check lactate at 0h, 6h, 12h post-start. Non-clearing lactate >3.4 mmol/L over 6\u201312h = strongest accumulation predictor. Rising lactate with stable/improving sepsis = suspect citrate.',
+                        'ESCALATION LADDER: tCa:iCa \u22652.1 \u2192 increase monitoring to Q2h + reduce citrate dose. tCa:iCa \u22652.5 + worsening HAGMA \u2192 STOP citrate, switch to no-anticoag protocol (Protocol v6 Citrate Toxicity pathway).',
+                        'CITRATE TOXICITY PROTOCOL: Reduce citrate to 2.0 mmol/L, cease post-filter iCa checks, increase Biphozyl dialysate by 500 ml/hr (NO potassium in Biphozyl). If ratio persists >2.5 \u2192 switch to CVVHDF with Prismasol (no citrate).'
+                    ]
+                });
+            }
+        } else if (anticoagShort === 'heparin') {
+            monitorItems.push({
+                title: '\uD83D\uDEE1\uFE0F Heparin Monitoring',
+                items: [
+                    'APTT: Q6h (target <60s or ratio 1.5\u20132.0)',
+                    'Anti-Xa: 0.3\u20130.5 IU/ml (if available, more reliable in ICU)',
+                    'Platelet count: Daily (4T score if drop >30%)',
+                    'Watch for: bleeding at catheter site, mucosal bleeding'
+                ]
+            });
+        } else {
+            monitorItems.push({
+                title: '\uD83D\uDEE1\uFE0F No Anticoagulation',
+                items: [
+                    'Circuit pressures: Q1\u20132h (watch for rising TMP/access pressure)',
+                    'Expected circuit life: 12\u201324h (saline flushes Q4h may help)',
+                    'Signs of clotting: darkening in filter, rising TMP, drop in filtration',
+                    'Prepare replacement circuit proactively'
+                ]
+            });
+        }
+
+        // Circuit monitoring
+        monitorItems.push({
+            title: '\uD83D\uDD04 Circuit Assessment',
+            items: [
+                'Access/return pressures: Trend Q4h',
+                'TMP (transmembrane pressure): Rising = filter clotting',
+                'Effluent colour: Should be clear/pale yellow',
+                'Filter inspection: Visual check for darkening/clots'
+            ]
+        });
+
+        // Haemodynamic monitoring based on shock state
+        if (isDistributive || isCardiogenic || isMixed) {
+            monitorItems.push({
+                title: '\uD83E\uDEC0 Haemodynamic Monitoring',
+                items: [
+                    'MAP: Continuous. Target \u226565 mmHg (or individualised)',
+                    `Vasopressor trend: ${isDistributive ? 'Expect possible increase during first 2h of CRRT' : 'Monitor closely for decompensation'}`,
+                    'Fluid balance: Strict I/O charting Q1h',
+                    isMixed ? 'Reassess shock phenotype Q2\u20134h \u2014 haemodynamics may evolve' : 'Cardiac output assessment if available (POCUS/PAC)'
+                ]
+            });
+        }
+
+        // Context-specific monitoring
+        if (hasBrainInjury) {
+            monitorItems.push({
+                title: '\uD83E\uDDE0 Neuro Monitoring',
+                items: [
+                    'Serum Na\u207A: Q4h (target correction <8 mmol/24h)',
+                    'Serum osmolality: Q6h',
+                    'GCS/pupil assessment: Q2h during correction'
+                ]
+            });
+        }
+        if (hasTLS) {
+            monitorItems.push({
+                title: '\uD83E\uDDEC TLS Monitoring',
+                items: [
+                    'Uric acid, PO\u2084, K\u207A, Ca\u00B2\u207A: Q4\u20136h',
+                    'LDH: Daily (tumour burden marker)',
+                    'ECG: Watch for QTc changes from electrolyte shifts'
+                ]
+            });
+        }
+        if (hasRhabdo) {
+            monitorItems.push({
+                title: '\uD83D\uDCAA Rhabdo Monitoring',
+                items: [
+                    'CK: Q8\u201312h (trending down = response)',
+                    'K\u207A: Q4\u20136h (release from damaged muscle)',
+                    'Myoglobin clearance: Watch urine colour',
+                    'Compartment pressures if clinical concern'
+                ]
+            });
+        }
+
+        let monitorHTML = monitorItems.map(section => `
+            <div style="margin-bottom: 12px;">
+                <div style="font-size: 13px; font-weight: 700; color: var(--primary); margin-bottom: 6px;">${section.title}</div>
+                <div style="font-size: 12px; color: var(--text-mid); line-height: 1.6;">
+                    ${section.items.map(item => '\u2022 ' + item).join('<br>')}
+                </div>
+            </div>
+        `).join('');
+
+        document.getElementById('monitoringSection').innerHTML = `
+            <div class="rx-card" style="margin-bottom: 20px;">
+                <div style="padding: 20px; border-top: 4px solid var(--primary);">
+                    <h3 style="font-size: 15px; font-weight: 700; color: var(--primary); margin-bottom: 16px;">\uD83D\uDCCB Monitoring Plan</h3>
+                    ${anticoagMonitoring ? `<div style="padding: 10px 14px; background: var(--warning-wash); border-left: 3px solid var(--warning); border-radius: 4px; margin-bottom: 14px; font-size: 12px; color: #92400e;"><strong>\u26A0\uFE0F Anticoag Alert:</strong> ${anticoagMonitoring}</div>` : ''}
+                    ${monitorHTML}
+                </div>
+            </div>`;
+
+        // === SEPSIS EVIDENCE (conditional) ===
+        const sepsisSec = document.getElementById('sepsisSection');
+        if (isDistributive || selections.context.has('sepsis')) {
+            let sepsisHTML = `
+                <div class="sepsis-section">
+                    <h3>\uD83E\uDDA0 Sepsis &amp; CRRT Evidence</h3>
+                    <div class="detail">
+                        <strong>High-Dose CRRT: NOT supported</strong><br>
+                        <strong>IVOIRE Trial (2013, n=137):</strong> HVHF 70 ml/kg/hr vs standard 35 ml/kg/hr \u2014 NO mortality benefit, NO haemodynamic improvement at 28 days.<br>
+                        <strong>Cochrane Review (2017):</strong> No beneficial effect of HVHF during sepsis.<br>
+                        <strong>Key insight:</strong> Cytokine removal is primarily by ADSORPTION (membrane binding) not convection. Higher flow doesn't improve cytokine clearance.<br><br>`;
+
+            // Oxiris evidence — only if Oxiris selected
+            if (filterType.includes('Oxiris')) {
+                // Determine how many Oxiris gates are met
+                const hasHighVasopressor = isDistributive || isMixed; // shock state = vasopressor-dependent
+                const hasAbdominalSource = selections.context.has('sepsis'); // sepsis context selected
+                const hasSepsisShock = hasHighVasopressor && hasAbdominalSource;
+
+                sepsisHTML += `
+                        <div style="margin:12px 0;padding:12px 14px;background:linear-gradient(135deg,#fffbeb 0%,#fef3c7 100%);border:1px solid #f59e0b;border-radius:8px;">
+                        <div style="font-size:12px;font-weight:700;color:#92400e;margin-bottom:8px;">\uD83C\uDF1F Oxiris Membrane \u2014 3-Gate Patient Selection</div>
+                        <div style="font-size:11px;color:#78350f;margin-bottom:8px;">
+                            <span class="tier-badge reina-upgrade">\u2B06\uFE0F REINA Upgrade</span> <span class="tier-badge clinician-judgement">\uD83E\uDDE0 Dr. CMY</span> Best candidates meet multiple criteria:
+                        </div>
+                        <table style="width:100%;font-size:11px;border-collapse:collapse;">
+                            <tr style="border-bottom:1px solid rgba(245,158,11,0.3);">
+                                <td style="padding:5px 8px;width:20px;font-size:14px;">${hasHighVasopressor ? '\u2705' : '\u2610'}</td>
+                                <td style="padding:5px 0;"><strong>Gate 1 \u2014 Vasopressor burden:</strong> NorA >0.5 mcg/kg/min or \u22652 vasopressors</td>
+                            </tr>
+                            <tr style="border-bottom:1px solid rgba(245,158,11,0.3);">
+                                <td style="padding:5px 8px;font-size:14px;">${hasAbdominalSource ? '\u2705' : '\u2610'}</td>
+                                <td style="padding:5px 0;"><strong>Gate 2 \u2014 Source:</strong> Abdominal/urinary (high Gram-negative probability). Strongest evidence signal.</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:5px 8px;font-size:14px;">\u2610</td>
+                                <td style="padding:5px 0;"><strong>Gate 3 \u2014 Inflammatory markers:</strong> Very high CRP/PCT/IL-6 with rapid deterioration. <em>(Assess at bedside)</em></td>
+                            </tr>
+                        </table>
+                        <div style="margin-top:8px;padding:6px 10px;background:rgba(245,158,11,0.12);border-radius:4px;font-size:10px;color:#92400e;">
+                            ${hasSepsisShock ? '\uD83D\uDFE2 Vasopressor-dependent + sepsis context = strong Oxiris candidate. Confirm inflammatory burden at bedside.' : '\uD83D\uDFE1 Partial criteria met. Oxiris is reasonable but assess all 3 gates. If haemodynamically stable with low inflammatory burden, M100 is also acceptable.'}
+                        </div>
+                        </div>
+
+                        <div style="margin:8px 0;padding:10px 14px;background:rgba(14,165,233,0.08);border-left:3px solid #0ea5e9;border-radius:4px;">
+                            <div style="font-size:11px;font-weight:700;color:#0369a1;margin-bottom:4px;">\u23F1\uFE0F 72-Hour Evaluation Checkpoint (APAC Consensus 2024)</div>
+                            <div style="font-size:10px;color:#0c4a6e;">
+                                Assess by 72h: vasopressor dose reduction + lactate clearance<br>
+                                \u2022 Improving \u2192 continue Oxiris for current filter run<br>
+                                \u2022 No improvement \u2192 consider switch to M100 (cost-effective, no proven inferiority for non-responders)<br>
+                                \u2022 Oxiris + citrate anticoagulation is preferred (extends filter life)
+                            </div>
+                        </div>
+
+                        <strong>Evidence:</strong> Meta-analysis (2023, 14 studies, n=695): lower 28-day mortality (OR 0.53), faster vasopressor weaning. Evidence quality: LOW. Broman 2019 (crossover RCT): endotoxin reduced in 78% vs 17% with standard filter.<br>
+                        <span style="font-size:10px;color:#92400e;">\u26A0\uFE0F CAUTION: Oxiris (AN69ST) adsorbs some drugs \u2014 monitor nafamostat and certain antibiotic/antifungal levels.</span>`;
+            }
+
+            sepsisHTML += `
+                    </div>
+                </div>`;
+            sepsisSec.innerHTML = sepsisHTML;
+        } else {
+            sepsisSec.innerHTML = '';
+        }
+
+        // === DYSNATREMIA GUIDANCE (REINA Upgrade) ===
+        const dysnatSec = document.getElementById('dysnatremiaSection');
+        if (hasDysnatemia) {
+            const hasODSRiskFactors = liverFail;
+            const citrateSodiumWarning = (anticoagShort === 'citrate');
+            let dh = '<div class="rx-card" style="padding:20px;border-top:4px solid #f59e0b;margin-bottom:20px;">';
+            dh += '<h3 style="font-size:15px;font-weight:700;color:#92400e;margin-bottom:16px;">\uD83E\uDDEA Dysnatraemia Management Guide</h3>';
+
+            dh += '<div class="micu-protocol-box"><h4><span class="tier-badge micu-protocol">\uD83C\uDFE5 MICU Protocol</span> Modality: CVVHD preferred</h4>';
+            dh += '<div style="font-size:12px;color:#334155;">Protocol v6 recommends CVVHD for isolated dysnatraemia (pure diffusion, predictable small-molecule control).</div></div>';
+
+            dh += '<div class="reina-upgrade-box"><h4><span class="tier-badge reina-upgrade">\u2B06\uFE0F REINA Upgrade</span> Modality: Any CRRT mode is acceptable</h4>';
+            dh += '<div style="font-size:12px;color:#78350f;">Evidence shows sodium predictability depends on <strong>fluid composition and monitoring</strong>, not the specific modality. Your selected modality (<strong>' + modality + '</strong>) based on all clinical goals is appropriate. Customise fluid Na\u207A instead.</div>';
+            dh += '<span class="evidence-toggle" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display===\'none\'?\'block\':\'none\'">Why is this different?</span>';
+            dh += '<div class="evidence-detail">Morimatsu 2003 \u2014 CVVHDF normalised Na more often than CVVH (74.1% vs 62.9%, p=0.003). Tandukar 2020 \u2014 Controlled correction with low-Na fluids regardless of modality.</div></div>';
+
+            dh += '<div class="reina-upgrade-box"><h4><span class="tier-badge reina-upgrade">\u2B06\uFE0F REINA Upgrade</span> Dose: Standard weight-based (no reduction needed)</h4>';
+            dh += '<div style="font-size:12px;color:#78350f;">Maintain prescribed 25\u201330 ml/kg/hr. Control Na\u207A correction through <strong>fluid sodium concentration</strong> and adjunct infusions, not by reducing CRRT dose. Your dose of <strong>' + prescribedDose + ' ml/kg/hr</strong> is appropriate.</div>';
+            dh += '<span class="evidence-toggle" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display===\'none\'?\'block\':\'none\'">Why is this different?</span>';
+            dh += '<div class="evidence-detail">ADQI/Precision-CRRT (Bagshaw 2016): 20\u201325 ml/kg/hr default. Tandukar 2020, Koning 2025: dysnatraemia series used ~27 ml/kg/h, adjusted fluid Na\u207A, not dose.</div></div>';
+
+            dh += '<div class="reina-upgrade-box"><h4><span class="tier-badge reina-upgrade">\u2B06\uFE0F REINA Upgrade</span> Na\u207A Gradient: Individualise (not fixed \u00B110)</h4>';
+            dh += '<div style="font-size:12px;color:#78350f;">Set dialysate Na\u207A = <strong>patient serum Na\u207A + desired 24h change</strong>. The dialysis-serum Na\u207A gradient is the single strongest predictor of Na\u207A change rate. Recalculate every 4\u20136h.</div>';
+            dh += '<span class="evidence-toggle" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display===\'none\'?\'block\':\'none\'">Why is this different?</span>';
+            dh += '<div class="evidence-detail">Troch\u00E9 2022 \u2014 Na\u207A gradient was the only independent predictor of Na\u207A change (r=0.57). Yessayan 2021, Chen 2023 \u2014 Kinetic models show standard 140 baths overshoot in severe hyponatraemia.</div></div>';
+
+            dh += '<div class="reina-upgrade-box"><h4><span class="tier-badge reina-upgrade">\u2B06\uFE0F REINA Upgrade</span> Correction Targets: Risk-stratified</h4>';
+            dh += '<div style="font-size:12px;color:#78350f;">';
+            if (hasODSRiskFactors) {
+                dh += '<div style="padding:8px 12px;background:rgba(220,38,38,0.1);border-left:3px solid #dc2626;border-radius:4px;margin-bottom:10px;"><strong>\u26A0\uFE0F High ODS Risk</strong> (liver failure): Target <strong>4\u20136 mmol/L/24h</strong> (max 8)</div>';
+            }
+            dh += '<table style="width:100%;font-size:11px;border-collapse:collapse;margin-top:6px;">';
+            dh += '<tr style="border-bottom:1px solid #d4a76a;"><th style="text-align:left;padding:4px 8px;">Scenario</th><th style="text-align:left;padding:4px 8px;">Target</th><th style="text-align:left;padding:4px 8px;">Monitoring</th></tr>';
+            dh += '<tr style="background:rgba(220,38,38,0.05);"><td style="padding:4px 8px;font-weight:600;">High ODS risk<br><span style="font-weight:400;font-size:10px;">(liver disease, Na&lt;115, alcoholism, malnutrition, hypoK)</span></td><td style="padding:4px 8px;font-weight:700;color:#dc2626;">4\u20136/24h (max 8)</td><td style="padding:4px 8px;">q2\u20134h</td></tr>';
+            dh += '<tr><td style="padding:4px 8px;font-weight:600;">Chronic hypoNa (&gt;48h/unknown)</td><td style="padding:4px 8px;font-weight:700;">6\u201310/24h</td><td style="padding:4px 8px;">q4\u20136h</td></tr>';
+            dh += '<tr><td style="padding:4px 8px;font-weight:600;">Acute hypoNa (&lt;48h)</td><td style="padding:4px 8px;font-weight:700;color:#059669;">Up to 10\u201312/24h</td><td style="padding:4px 8px;">q2\u20134h</td></tr>';
+            dh += '<tr><td style="padding:4px 8px;font-weight:600;">HyperNa</td><td style="padding:4px 8px;font-weight:700;">10\u201312/24h (safe in adults)</td><td style="padding:4px 8px;">q4\u20136h</td></tr>';
+            dh += '</table></div>';
+            dh += '<span class="evidence-toggle" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display===\'none\'?\'block\':\'none\'">Why is this different?</span>';
+            dh += '<div class="evidence-detail">Protocol v6: blanket \u226410/24h. Ayus 2024 JAMA: faster correction associated with lower mortality. Tandukar 2021: ODS even within \u226410 in high-risk, supports 4\u20136 target. Pattamin 2025: faster hyperNa correction = lower mortality.</div></div>';
+
+            if (citrateSodiumWarning) {
+                dh += '<div class="clinician-judgement-box"><h4><span class="tier-badge clinician-judgement">\uD83E\uDDE0 Clinician\u2019s Judgement</span> Citrate adds Na\u207A load</h4>';
+                dh += '<div style="font-size:12px;color:#581c87;">Trisodium citrate contributes significant sodium. ~49% of hyponatraemic patients overcorrected &gt;8/24h on standard CVVHD-citrate (Hellman 2021). Account for Na\u207A load in gradient calculation. Monitor Na\u207A q2\u20134h initially.</div></div>';
+            }
+
+            dh += '<div class="reina-upgrade-box"><h4><span class="tier-badge reina-upgrade">\u2B06\uFE0F REINA Upgrade</span> Kinetics-Driven Approach</h4>';
+            dh += '<div style="font-size:12px;color:#78350f;"><strong>1.</strong> Choose target \u0394Na\u207A/24h (see table above)<br>';
+            dh += '<strong>2.</strong> Set bath Na\u207A = serum Na\u207A + desired daily change<br>';
+            dh += '<strong>3.</strong> Use mixing equations to back-calculate dialysate Na\u207A / D5W rate<br>';
+            dh += '<strong>4.</strong> Check Na\u207A every 2\u20136h, recalculate and adjust<br>';
+            dh += '<strong>5.</strong> Account for non-CRRT Na\u207A fluxes (urine, drains, IV fluids)</div>';
+            dh += '<span class="evidence-toggle" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display===\'none\'?\'block\':\'none\'">Evidence</span>';
+            dh += '<div class="evidence-detail">Chen 2023: mixing paradigm. Neyra 2018, 2020: protocolised approach achieved ~6/day target. Yessayan 2021: comprehensive kinetic equations for CRRT Na\u207A management.</div></div>';
+
+            dh += '<div class="clinician-judgement-box"><h4><span class="tier-badge clinician-judgement">\uD83E\uDDE0 Clinician\u2019s Judgement</span> Fluid Customisation Strategies</h4>';
+            dh += '<div style="font-size:12px;color:#581c87;"><strong>HypoNa:</strong> Low-Na\u207A dialysate (119\u2013126), manual dilution with sterile water, or D5W prefilter<br>';
+            dh += '<strong>HyperNa:</strong> Dialysate Na\u207A ~5\u201310 below serum, or 3% NaCl infusion<br>';
+            dh += '<strong>Overcorrection rescue:</strong> D5W infusion \u00B1 DDAVP</div></div>';
+
+            dh += '<div class="micu-protocol-box"><h4><span class="tier-badge micu-protocol">\uD83C\uDFE5 MICU Protocol</span> + <span class="tier-badge reina-upgrade">\u2B06\uFE0F Enhanced</span> Monitoring</h4>';
+            dh += '<div style="font-size:12px;color:#334155;">';
+            dh += '\u2022 Serum Na\u207A: <strong>q2\u20134h</strong> first 24h (q4\u20136h once stable)<br>';
+            dh += '\u2022 Serum osmolality: q6\u20138h<br>';
+            dh += '\u2022 Neuro assessment: q2\u20134h (GCS, pupils)<br>';
+            dh += '\u2022 K\u207A: q4\u20136h (hypoK\u207A increases ODS risk)<br>';
+            dh += '\u2022 Document all Na\u207A sources: IV fluids, feeds, medications<br>';
+            dh += '\u2022 If urine output present: may accelerate correction unpredictably</div></div>';
+
+            dh += '</div>';
+            dysnatSec.innerHTML = dh;
+        } else {
+            dysnatSec.innerHTML = '';
+        }
+
+        // === PROTOCOL TABLE ===
+        const ptSection = document.getElementById('protocolTableSection');
+        const activeCol = weightCat === 'low' ? 1 : (weightCat === 'mid' ? 2 : 3);
+        let tableHTML = '';
+
+        if (modality === 'CVVHDF' && anticoagShort === 'citrate') {
+            tableHTML = `
+                <div class="protocol-table-section">
+                    <h3>\uD83D\uDCCB MICU Protocol Reference Table</h3>
+                    <div class="table-note">Based on MICU RRT Protocol Version 6.0 \u2022 Citrate anticoagulation</div>
+                    <table class="protocol-table">
+                        <thead>
+                            <tr><th class="header-row" colspan="4">CVVHDF (Regiocit) \u2013 Citrate Anticoagulation</th></tr>
+                            <tr>
+                                <th>Parameter</th>
+                                <th ${activeCol===1?'class="active-weight"':''}>&#60;60 kg</th>
+                                <th ${activeCol===2?'class="active-weight"':''}>60\u201375 kg</th>
+                                <th ${activeCol===3?'class="active-weight"':''}>&#62;75 kg</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Blood Flow</td><td ${activeCol===1?'class="active-weight"':''}>150 ml/min</td><td ${activeCol===2?'class="active-weight"':''}>150 ml/min</td><td ${activeCol===3?'class="active-weight"':''}>150 ml/min</td></tr>
+                            <tr><td>Regiocit (pre-pump)</td><td colspan="3">~${regiocitFlow} ml/hr (machine-controlled, citrate ${CITRATE_DOSE} mmol/L)</td></tr>
+                            <tr><td>MgSO\u2084 in NS (post-filter)</td><td ${activeCol===1?'class="active-weight"':''}>50 ml/hr</td><td ${activeCol===2?'class="active-weight"':''}>50 ml/hr</td><td ${activeCol===3?'class="active-weight"':''}>50 ml/hr</td></tr>
+                            <tr><td>Biphozyl (Dialysate)</td><td ${activeCol===1?'class="active-weight"':''}>500 ml/hr</td><td ${activeCol===2?'class="active-weight"':''}>1000 ml/hr</td><td ${activeCol===3?'class="active-weight"':''}>1500 ml/hr</td></tr>
+                            <tr><td>NaHCO\u2083 8.45%</td><td colspan="3">0 / 25 / 50 ml/hr (target pH 7.25\u20137.45)</td></tr>
+                            <tr><td>Prescribed Dose</td><td ${activeCol===1?'class="active-weight"':''}>&#62;30 ml/kg/hr</td><td ${activeCol===2?'class="active-weight"':''}>31\u201338 ml/kg/hr</td><td ${activeCol===3?'class="active-weight"':''}>&#60;37 ml/kg/hr</td></tr>
+                        </tbody>
+                    </table>
+                </div>`;
+        } else if (modality === 'CVVHDF' && anticoagShort === 'heparin') {
+            tableHTML = `
+                <div class="protocol-table-section">
+                    <h3>\uD83D\uDCCB MICU Protocol Reference Table</h3>
+                    <div class="table-note">Based on MICU RRT Protocol Version 6.0 \u2022 Heparin anticoagulation</div>
+                    <table class="protocol-table">
+                        <thead>
+                            <tr><th class="header-row" colspan="4">CVVHDF (Prismasol) \u2013 Heparin</th></tr>
+                            <tr>
+                                <th>Parameter</th>
+                                <th ${activeCol===1?'class="active-weight"':''}>&#60;60 kg</th>
+                                <th ${activeCol===2?'class="active-weight"':''}>60\u201375 kg</th>
+                                <th ${activeCol===3?'class="active-weight"':''}>&#62;75 kg</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Blood Flow</td><td ${activeCol===1?'class="active-weight"':''}>200 ml/min</td><td ${activeCol===2?'class="active-weight"':''}>200 ml/min</td><td ${activeCol===3?'class="active-weight"':''}>250 ml/min</td></tr>
+                            <tr><td>Replacement (pre-filter)</td><td ${activeCol===1?'class="active-weight"':''}>1000 ml/hr</td><td ${activeCol===2?'class="active-weight"':''}>1250 ml/hr</td><td ${activeCol===3?'class="active-weight"':''}>1500 ml/hr</td></tr>
+                            <tr><td>Dialysate</td><td ${activeCol===1?'class="active-weight"':''}>500 ml/hr</td><td ${activeCol===2?'class="active-weight"':''}>1000 ml/hr</td><td ${activeCol===3?'class="active-weight"':''}>1000 ml/hr</td></tr>
+                            <tr><td>Heparin Start</td><td colspan="3">5 units/kg/hr (target APTT &#60;60s)</td></tr>
+                        </tbody>
+                    </table>
+                </div>`;
+        } else if (modality === 'CVVHDF') {
+            // No anticoag default table
+            tableHTML = `
+                <div class="protocol-table-section">
+                    <h3>\uD83D\uDCCB MICU Protocol Reference Table</h3>
+                    <div class="table-note">Based on MICU RRT Protocol Version 6.0 \u2022 No anticoagulation</div>
+                    <table class="protocol-table">
+                        <thead>
+                            <tr><th class="header-row" colspan="4">CVVHDF (Prismasol) \u2013 No Anticoagulation</th></tr>
+                            <tr>
+                                <th>Parameter</th>
+                                <th ${activeCol===1?'class="active-weight"':''}>&#60;60 kg</th>
+                                <th ${activeCol===2?'class="active-weight"':''}>60\u201375 kg</th>
+                                <th ${activeCol===3?'class="active-weight"':''}>&#62;75 kg</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Blood Flow</td><td ${activeCol===1?'class="active-weight"':''}>200 ml/min</td><td ${activeCol===2?'class="active-weight"':''}>200 ml/min</td><td ${activeCol===3?'class="active-weight"':''}>250 ml/min</td></tr>
+                            <tr><td>Replacement (pre-filter)</td><td ${activeCol===1?'class="active-weight"':''}>1250 ml/hr</td><td ${activeCol===2?'class="active-weight"':''}>1500 ml/hr</td><td ${activeCol===3?'class="active-weight"':''}>2000 ml/hr</td></tr>
+                            <tr><td>Dialysate</td><td ${activeCol===1?'class="active-weight"':''}>500 ml/hr</td><td ${activeCol===2?'class="active-weight"':''}>1000 ml/hr</td><td ${activeCol===3?'class="active-weight"':''}>1000 ml/hr</td></tr>
+                        </tbody>
+                    </table>
+                </div>`;
+        } else if (modality === 'CVVH' && anticoagShort === 'citrate') {
+            tableHTML = `
+                <div class="protocol-table-section">
+                    <h3>\uD83D\uDCCB MICU Protocol Reference Table</h3>
+                    <div class="table-note">Based on MICU RRT Protocol Version 6.0 \u2022 CVVH Citrate</div>
+                    <table class="protocol-table">
+                        <thead>
+                            <tr><th class="header-row" colspan="4">CVVH (Regiocit) \u2013 Citrate Anticoagulation</th></tr>
+                            <tr>
+                                <th>Parameter</th>
+                                <th ${activeCol===1?'class="active-weight"':''}>&#60;60 kg</th>
+                                <th ${activeCol===2?'class="active-weight"':''}>60\u201375 kg</th>
+                                <th ${activeCol===3?'class="active-weight"':''}>&#62;75 kg</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Blood Flow</td><td ${activeCol===1?'class="active-weight"':''}>120 ml/min</td><td ${activeCol===2?'class="active-weight"':''}>120 ml/min</td><td ${activeCol===3?'class="active-weight"':''}>150 ml/min</td></tr>
+                            <tr><td>Regiocit (pre-pump)</td><td colspan="3">~${regiocitFlow} ml/hr (machine-controlled, citrate ${CITRATE_DOSE} mmol/L)</td></tr>
+                            <tr><td>Replacement (Biphozyl, post-filter)</td><td ${activeCol===1?'class="active-weight"':''}>500 ml/hr</td><td ${activeCol===2?'class="active-weight"':''}>1000 ml/hr</td><td ${activeCol===3?'class="active-weight"':''}>1250 ml/hr</td></tr>
+                            <tr><td>Dialysate</td><td colspan="3">None (convection only)</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="table-note" style="color: #dc2626; margin-top: 8px;">\u26A0\uFE0F Avoid CVVH + Citrate if K\u207A >5.5 mmol/L (no dialysate for K\u207A clearance)</div>
+                </div>`;
+        } else if (modality === 'CVVH' && anticoagShort === 'heparin') {
+            tableHTML = `
+                <div class="protocol-table-section">
+                    <h3>\uD83D\uDCCB MICU Protocol Reference Table</h3>
+                    <div class="table-note">Based on MICU RRT Protocol Version 6.0 \u2022 CVVH Heparin</div>
+                    <table class="protocol-table">
+                        <thead>
+                            <tr><th class="header-row" colspan="4">CVVH (Prismasol) \u2013 Heparin</th></tr>
+                            <tr>
+                                <th>Parameter</th>
+                                <th ${activeCol===1?'class="active-weight"':''}>&#60;60 kg</th>
+                                <th ${activeCol===2?'class="active-weight"':''}>60\u201375 kg</th>
+                                <th ${activeCol===3?'class="active-weight"':''}>&#62;75 kg</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Blood Flow</td><td ${activeCol===1?'class="active-weight"':''}>200 ml/min</td><td ${activeCol===2?'class="active-weight"':''}>200 ml/min</td><td ${activeCol===3?'class="active-weight"':''}>250 ml/min</td></tr>
+                            <tr><td>Total Replacement</td><td ${activeCol===1?'class="active-weight"':''}>1750 ml/hr</td><td ${activeCol===2?'class="active-weight"':''}>2500 ml/hr</td><td ${activeCol===3?'class="active-weight"':''}>3000 ml/hr</td></tr>
+                            <tr><td>Split</td><td colspan="3">65% pre-filter / 35% post-filter</td></tr>
+                            <tr><td>Dialysate</td><td colspan="3">None (convection only)</td></tr>
+                            <tr><td>Heparin</td><td colspan="3">5 units/kg/hr (target APTT &#60;60s)</td></tr>
+                        </tbody>
+                    </table>
+                </div>`;
+        } else if (modality === 'CVVH') {
+            tableHTML = `
+                <div class="protocol-table-section">
+                    <h3>\uD83D\uDCCB MICU Protocol Reference Table</h3>
+                    <div class="table-note">Based on MICU RRT Protocol Version 6.0 \u2022 CVVH No anticoagulation</div>
+                    <table class="protocol-table">
+                        <thead>
+                            <tr><th class="header-row" colspan="4">CVVH (Prismasol) \u2013 No Anticoagulation</th></tr>
+                            <tr>
+                                <th>Parameter</th>
+                                <th ${activeCol===1?'class="active-weight"':''}>&#60;60 kg</th>
+                                <th ${activeCol===2?'class="active-weight"':''}>60\u201375 kg</th>
+                                <th ${activeCol===3?'class="active-weight"':''}>&#62;75 kg</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Blood Flow</td><td ${activeCol===1?'class="active-weight"':''}>200 ml/min</td><td ${activeCol===2?'class="active-weight"':''}>200 ml/min</td><td ${activeCol===3?'class="active-weight"':''}>250 ml/min</td></tr>
+                            <tr><td>Total Replacement</td><td ${activeCol===1?'class="active-weight"':''}>1750 ml/hr</td><td ${activeCol===2?'class="active-weight"':''}>2500 ml/hr</td><td ${activeCol===3?'class="active-weight"':''}>3000 ml/hr</td></tr>
+                            <tr><td>Split</td><td colspan="3">70% pre-filter / 30% post-filter</td></tr>
+                            <tr><td>Dialysate</td><td colspan="3">None (convection only)</td></tr>
+                        </tbody>
+                    </table>
+                </div>`;
+        }
+
+        ptSection.innerHTML = tableHTML;
+
+        // === CLINICAL PROMPTS ===
+        let prompts = [];
+        if (prescribedDose < 30) {
+            prompts.push('Lower prescribed dose may result in delivered dose below target 20 ml/kg/hr');
+            prompts.push('Consider: Is this for pure SCUF/volume removal only?');
+        }
+        if (prescribedDose > 40) {
+            prompts.push('High-dose CRRT (>35\u201340 ml/kg/hr) shows NO mortality benefit');
+            prompts.push('IVOIRE trial: 70 vs 35 ml/kg/hr \u2013 no difference in sepsis outcomes');
+            prompts.push('Consider: Is the goal better achieved by modality change or filter selection?');
+        }
+        if (deliveredEstimate < 20) {
+            prompts.push('Expected delivered dose <20 ml/kg/hr may be subtherapeutic');
+            prompts.push('ATN/RENAL trials targeted delivered dose of 20\u201325 ml/kg/hr');
+        }
+        if (hasEmergency) {
+            prompts.push('Emergency indication present \u2013 do not delay initiation for optimisation. Start now, refine later.');
+        }
+        if (modality === 'CVVH' && anticoagShort === 'citrate') {
+            prompts.push('\u26A0\uFE0F CVVH + Citrate: No dialysate component \u2192 limited K\u207A clearance. If K\u207A >5.5 mmol/L, switch to CVVHDF for diffusive K\u207A removal.');
+        }
+        if (modality === 'CVVH') {
+            prompts.push('CVVH = convection only. Good for medium molecules and volume. If small molecule clearance becomes a priority (K\u207A, urea), consider switching to CVVHDF.');
+        }
+
+        document.getElementById('clinicalPrompts').innerHTML = prompts.length > 0 ?
+            `<div class="clinical-prompts">
+                <h4>\uD83E\uDD14 Critical Thinking Prompts</h4>
+                <ul>${prompts.map(p => `<li>${p}</li>`).join('')}</ul>
+            </div>` : '';
+
+        // === KEY EVIDENCE BOX ===
+        document.getElementById('evidenceBox').innerHTML = `
+            <div class="evidence-box">
+                <strong>\uD83D\uDCDA Key Evidence:</strong>
+                \u2022 <strong>RENAL (2009):</strong> 40 vs 25 ml/kg/hr \u2013 no mortality difference<br>
+                \u2022 <strong>ATN (2008):</strong> 35 vs 20 ml/kg/hr \u2013 no mortality difference<br>
+                \u2022 <strong>IVOIRE (2013):</strong> 70 vs 35 ml/kg/hr in sepsis \u2013 no benefit from high-volume<br>
+                \u2022 <strong>RICH (Zarbock, JAMA 2020):</strong> Citrate median filter life 47h vs heparin 26h, less bleeding. No mortality difference.<br>
+                \u2022 <strong>STARRT-AKI (2020):</strong> Early vs standard timing \u2013 ~38% of delayed patients never needed RRT<br>
+                \u2022 <strong>Target:</strong> Delivered dose 20\u201325 ml/kg/hr is standard of care
+            </div>`;
+
+        // === CLINICAL REASONING ===
+        const reasoningBody = document.getElementById('reasoningBody');
+        let reasoning = '';
+        reasoning += `<div class="reasoning-item"><span class="r-icon">\uD83C\uDFAF</span><span><strong>Modality:</strong> ${modalityReason}</span></div>`;
+        reasoning += `<div class="reasoning-item"><span class="r-icon">\uD83D\uDEE1\uFE0F</span><span><strong>Anticoagulation:</strong> ${anticoagReason}</span></div>`;
+        reasoning += `<div class="reasoning-item"><span class="r-icon">\uD83E\uDDEB</span><span><strong>Filter:</strong> ${filterReason}</span></div>`;
+        reasoning += `<div class="reasoning-item"><span class="r-icon">\uD83D\uDC8A</span><span><strong>Dose:</strong> ${doseReason}</span></div>`;
+        reasoning += `<div class="reasoning-item"><span class="r-icon">\uD83D\uDCA7</span><span><strong>UF Rate:</strong> ${ufReason}</span></div>`;
+
+        if (hasEmergency) {
+            reasoning += `<div class="reasoning-item"><span class="r-icon">\uD83D\uDEA8</span><span><strong>Urgency:</strong> Emergency indication present. Do not delay initiation for optimisation. Start now, refine later.</span></div>`;
+        }
+
+        reasoningBody.innerHTML = reasoning;
+
+        // === EVIDENCE BODY (Ring 3: structured by domain) ===
+        const evidenceBody = document.getElementById('evidenceBody');
+        let evidence = '';
+
+        // Modality evidence — always shown (no dedicated section elsewhere)
+        evidence += renderEvidenceCards('modality', 'Modality');
+
+        // Timing evidence — complements the initiation timing panel above
+        evidence += renderEvidenceCards('timing', 'Initiation Timing');
+
+        // Drug dosing evidence — useful for all patients on CRRT
+        evidence += renderEvidenceCards('drugDosing', 'Drug Dosing on CRRT');
+
+        // Special populations — conditional
+        if (hasRhabdo) {
+            evidence += renderEvidenceCards('rhabdo', 'Rhabdomyolysis');
+        }
+        if (hasTLS) {
+            evidence += renderEvidenceCards('tls', 'Tumour Lysis Syndrome');
+        }
+
+        // Discontinuation evidence — complements the discontinuation module above
+        evidence += renderEvidenceCards('discontinuation', 'Discontinuation');
+
+        if (filterType.includes('Oxiris')) {
+            evidence += renderEvidenceCards('filter', 'Filter Selection');
+        }
+
+        if (hasEmergency) {
+            evidence += `<div class="reasoning-item" style="margin-top:8px;"><span class="r-icon">\uD83D\uDEA8</span><span><strong>Emergency Override:</strong> Emergency indications override timing studies. Do not delay initiation. <span class="evidence-pill">KDIGO</span></span></div>`;
+        }
+
+        evidence += `<div style="font-size:10px;color:#94a3b8;margin-top:10px;text-align:center;">\uD83D\uDCDA Domain-specific evidence cards also shown inline above (Dose, Anticoagulation, Fluid Removal). Last updated: ${EVIDENCE_UPDATED}</div>`;
+
+        evidenceBody.innerHTML = evidence;
+
+        // === CONTEXT WARNINGS ===
+        let warnings = '';
+        if (isMixed) {
+            warnings += `
+            <div class="rx-card" style="margin-bottom: 12px;">
+                <div style="padding: 16px 20px; border-left: 4px solid var(--warning); background: var(--warning-wash);">
+                    <div style="font-size: 13px; font-weight: 700; color: #92400e; margin-bottom: 6px;">\uD83D\uDD04 Mixed/Evolving Shock</div>
+                    <div style="font-size: 12px; color: var(--text-mid);">Haemodynamics are unpredictable. Reassess shock phenotype Q2\u20134h. UF settings are conservative \u2014 titrate based on response. Be prepared to pause UF or adjust modality as picture evolves.</div>
+                </div>
+            </div>`;
+        }
+        if (hasBrainInjury) {
+            warnings += `
+            <div class="rx-card" style="margin-bottom: 12px;">
+                <div style="padding: 16px 20px; border-left: 4px solid var(--warning); background: var(--warning-wash);">
+                    <div style="font-size: 13px; font-weight: 700; color: #92400e; margin-bottom: 6px;">\u26A0\uFE0F Brain Injury Modification</div>
+                    <div style="font-size: 12px; color: var(--text-mid);">Custom dialysate Na\u207A to match serum \u00B15 mmol/L. Avoid rapid osmolality shifts. Monitor Na\u207A Q4h. Target correction rate &lt;8 mmol/24h.</div>
+                </div>
+            </div>`;
+        }
+        if (hasCircuitIssues) {
+            warnings += `
+            <div class="rx-card" style="margin-bottom: 12px;">
+                <div style="padding: 16px 20px; border-left: 4px solid var(--warning); background: var(--warning-wash);">
+                    <div style="font-size: 13px; font-weight: 700; color: #92400e; margin-bottom: 6px;">\uD83D\uDD04 Circuit Clotting Strategy</div>
+                    <div style="font-size: 12px; color: var(--text-mid);">Review anticoagulation adequacy, access function, blood flow. Consider: citrate dose optimisation, pre-dilution mode, access reversal trial, catheter exchange if dysfunction suspected.</div>
+                </div>
+            </div>`;
+        }
+        document.getElementById('contextWarnings').innerHTML = warnings;
+
+        // === INITIATION TIMING ALGORITHM (Barbar 2025 + Dr. CMY) ===
+        let timingHTML = '';
+        timingHTML += `
+        <div class="reina-upgrade-box" style="margin-top:16px;">
+            <h4><span class="tier-badge reina-upgrade">\u2B06\uFE0F REINA Upgrade</span> RRT Initiation Timing (Barbar 2025 + Phase 2 Consultation)</h4>
+            <div style="font-size:12px;color:#78350f;line-height:1.7;">
+                <strong>Entry criterion:</strong> AKI KDIGO \u22652 in ICU \u00B1 MOF (Dr. CMY: AKIN Stage 3 is the classification threshold for action)<br><br>`;
+
+        if (hasEmergency) {
+            timingHTML += `
+                <div style="padding:10px 14px;background:rgba(220,38,38,0.08);border-left:3px solid #dc2626;border-radius:4px;margin-bottom:10px;">
+                    <strong>\uD83D\uDEA8 IMMEDIATE RRT</strong> \u2014 Emergency indication selected. Do not delay.<br>
+                    <span style="font-size:11px;">Barbar 2025: K\u207A >6.5 + ECG + refractory | pH \u22647.15 unresponsive to bicarb | Fluid overload + P/F <200 or balance >10% BW</span>
+                </div>`;
+        } else {
+            timingHTML += `
+                <div style="padding:10px 14px;background:rgba(5,150,105,0.08);border-left:3px solid #059669;border-radius:4px;margin-bottom:10px;">
+                    <strong>\uD83D\uDD52 No emergency indication \u2192 Watchful waiting is safe</strong><br>
+                    <span style="font-size:11px;">STARRT-AKI/AKIKI: ~38% of patients in delayed arms never needed RRT. Dynamic reassessment Q8h for emergency criteria.</span>
+                </div>
+                <div style="padding:10px 14px;background:rgba(217,119,6,0.08);border-left:3px solid #d97706;border-radius:4px;margin-bottom:10px;">
+                    <strong>\u26A0\uFE0F Maximum wait: 72 hours</strong> (Dr. CMY: "not more than 3 days")<br>
+                    <span style="font-size:11px;">AKIKI-2: Delay past oliguria >72h or BUN >112 mg/dL \u2192 mortality \u2191 (HR 1.65). Start RRT if persistent AKI at this point.</span>
+                </div>`;
+        }
+
+        timingHTML += `
+                <span class="evidence-toggle" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'">View full algorithm</span>
+                <div class="evidence-detail" style="margin-top:8px;">
+                    <strong>Barbar 2025 Algorithm (Fig. 1):</strong><br>
+                    AKI KDIGO \u22652 \u2192 Life-threatening? \u2192 <strong>Yes:</strong> Immediate RRT<br>
+                    \u2192 <strong>No:</strong> Reassess Q8h \u2192 Emergency develops? \u2192 Immediate RRT<br>
+                    \u2192 Still no emergency after 72h + persistent AKI (oliguria or BUN >112) \u2192 Start RRT<br><br>
+                    <strong>Emergency thresholds:</strong> K\u207A >6.5 + ECG changes + refractory to medical Rx | pH \u22647.15 unresponsive to 100 mL bicarb 4.2% | Fluid overload (pulm oedema, P/F <200, or balance >10% BW) + refractory to diuretics<br><br>
+                    <strong>Sources:</strong> Barbar ICM 2025; STARRT-AKI (NEJM 2020); AKIKI (NEJM 2016); AKIKI-2 (Lancet 2021); IDEAL-ICU (NEJM 2018); Phase 2 consultation (Dr. CMY: AKIN 3, max 3 days, optimise resuscitation first if unstable)
+                </div>
+            </div>
+        </div>`;
+        document.getElementById('initiationTimingSection').innerHTML = timingHTML;
+
+        // === DISCONTINUATION & STEP-DOWN MODULE (Ring 2 Build 1) ===
+        // Sources: Q7.1 (discontinuation criteria), Q7.2 (CRRT-to-IHD transition),
+        //          Q10.2 (futility/goals of care), Dr. CMY consultation (composite assessment)
+        // Evidence tier: REINA Evidence Upgrade + Clinician's Judgement
+        let discoHTML = '';
+        discoHTML += `
+        <div class="reina-upgrade-box" style="margin-top:16px;">
+            <h4><span class="tier-badge reina-upgrade">\u2B06\uFE0F REINA Upgrade</span> <span class="tier-badge clinician-judgement">\uD83E\uDDE0 Clinician\u2019s Judgement</span> Discontinuation & Step-Down</h4>
+            <div style="font-size:12px;color:#78350f;line-height:1.7;">
+
+                <strong>Daily Readiness Assessment</strong> (composite \u2014 assess at each review round)<br>
+                <div style="margin:8px 0;padding:10px 14px;background:rgba(5,150,105,0.06);border:1px solid rgba(5,150,105,0.2);border-radius:6px;">
+                    <div style="font-size:11px;font-weight:700;color:#059669;margin-bottom:6px;">TRIAL-OFF CHECKLIST \u2014 \u22654 of 6 criteria should trend favourably</div>
+                    <table style="width:100%;font-size:11px;border-collapse:collapse;">
+                        <tr style="border-bottom:1px solid rgba(5,150,105,0.15);">
+                            <td style="padding:4px 8px;width:24px;">\u2610</td>
+                            <td style="padding:4px 0;"><strong>Urine output:</strong> >400\u2013500 mL/24h WITHOUT diuretics</td>
+                            <td style="padding:4px 8px;color:#059669;font-size:10px;text-align:right;">Strongest predictor (AUC 0.8\u20130.9)</td>
+                        </tr>
+                        <tr style="border-bottom:1px solid rgba(5,150,105,0.15);">
+                            <td style="padding:4px 8px;">\u2610</td>
+                            <td style="padding:4px 0;"><strong>Creatinine trend:</strong> falling or stable (not rising)</td>
+                            <td style="padding:4px 8px;color:#059669;font-size:10px;text-align:right;">Strong</td>
+                        </tr>
+                        <tr style="border-bottom:1px solid rgba(5,150,105,0.15);">
+                            <td style="padding:4px 8px;">\u2610</td>
+                            <td style="padding:4px 0;"><strong>Non-renal SOFA:</strong> improving or stable</td>
+                            <td style="padding:4px 8px;color:#059669;font-size:10px;text-align:right;">Moderate\u2013strong</td>
+                        </tr>
+                        <tr style="border-bottom:1px solid rgba(5,150,105,0.15);">
+                            <td style="padding:4px 8px;">\u2610</td>
+                            <td style="padding:4px 0;"><strong>Haemodynamics:</strong> off vasopressors or NorA <0.1 mcg/kg/min</td>
+                            <td style="padding:4px 8px;color:#059669;font-size:10px;text-align:right;">Moderate (Dr. CMY)</td>
+                        </tr>
+                        <tr style="border-bottom:1px solid rgba(5,150,105,0.15);">
+                            <td style="padding:4px 8px;">\u2610</td>
+                            <td style="padding:4px 0;"><strong>Fluid balance:</strong> neutral or negative (not overloaded)</td>
+                            <td style="padding:4px 8px;color:#059669;font-size:10px;text-align:right;">Moderate</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:4px 8px;">\u2610</td>
+                            <td style="padding:4px 0;"><strong>Acid-base & electrolytes:</strong> pH >7.25, K\u207A <5.5 mmol/L</td>
+                            <td style="padding:4px 8px;color:#059669;font-size:10px;text-align:right;">Moderate (Dr. CMY)</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0;">
+                    <div style="padding:10px 14px;background:rgba(5,150,105,0.08);border-left:3px solid #059669;border-radius:4px;">
+                        <div style="font-size:11px;font-weight:700;color:#059669;margin-bottom:4px;">\u2705 If \u22654/6 met: Trial Off CRRT</div>
+                        <div style="font-size:10px;color:#065f46;">
+                            Monitor post-discontinuation:<br>
+                            \u2022 UO, Cr, K\u207A at 6h, 12h, 24h<br>
+                            \u2022 Fluid balance Q12h<br>
+                            \u2022 pH if previously acidotic
+                        </div>
+                    </div>
+                    <div style="padding:10px 14px;background:rgba(220,38,38,0.08);border-left:3px solid #dc2626;border-radius:4px;">
+                        <div style="font-size:11px;font-weight:700;color:#dc2626;margin-bottom:4px;">\u26D4 Restart CRRT if (during trial):</div>
+                        <div style="font-size:10px;color:#991b1b;">
+                            \u2022 UO drops <200 mL/12h<br>
+                            \u2022 K\u207A >6.0 (+ ECG changes = immediate)<br>
+                            \u2022 pH <7.20 despite medical Rx<br>
+                            \u2022 NorA restarted >0.1 mcg/kg/min<br>
+                            \u2022 Fluid overload recurs
+                        </div>
+                    </div>
+                </div>`;
+
+        // Conditional: if haemodynamically unstable, add IHD transition caution
+        if (isDistributive || isMixed) {
+            discoHTML += `
+                <div style="padding:10px 14px;background:rgba(217,119,6,0.08);border-left:3px solid #d97706;border-radius:4px;margin:8px 0;">
+                    <div style="font-size:11px;font-weight:700;color:#92400e;margin-bottom:4px;">\u26A0\uFE0F CRRT \u2192 IHD Transition: Use Caution</div>
+                    <div style="font-size:10px;color:#78350f;">
+                        Patient is haemodynamically labile. Any vasopressor at transition \u2192 3.9\u00D7 intradialytic hypotension (IDH) risk.<br>
+                        \u2022 Aim: MAP \u226570\u201375 mmHg without vasopressors before attempting IHD<br>
+                        \u2022 Consider SLED/hybrid as intermediate step for borderline-stable patients<br>
+                        \u2022 Higher MAP on transition day independently increases success (aOR 1.02/mmHg)
+                    </div>
+                </div>`;
+        } else {
+            discoHTML += `
+                <div style="padding:10px 14px;background:rgba(14,165,233,0.08);border-left:3px solid #0ea5e9;border-radius:4px;margin:8px 0;">
+                    <div style="font-size:11px;font-weight:700;color:#0369a1;margin-bottom:4px;">\uD83D\uDD04 CRRT \u2192 IHD Transition</div>
+                    <div style="font-size:10px;color:#0c4a6e;">
+                        When haemodynamically stable and renal recovery confirmed:<br>
+                        \u2022 Aim: MAP \u226570\u201375, off vasopressors, fluid-tolerant<br>
+                        \u2022 Any vasopressor at transition \u2192 3.9\u00D7 IDH risk (caution)<br>
+                        \u2022 Consider SLED as intermediate step if uncertain stability
+                    </div>
+                </div>`;
+        }
+
+        discoHTML += `
+                <div style="padding:10px 14px;background:rgba(168,85,247,0.08);border-left:3px solid #a855f7;border-radius:4px;margin:8px 0;">
+                    <div style="font-size:11px;font-weight:700;color:#6b21a8;margin-bottom:4px;">\uD83D\uDCC5 Prolonged CRRT Advisory (\u22657 days)</div>
+                    <div style="font-size:10px;color:#581c87;">
+                        If no renal recovery after 7 days of CRRT, consider:<br>
+                        \u2022 Goals-of-care discussion with patient/family (KDIGO + expert consensus)<br>
+                        \u2022 Prolonged CRRT exposure associated with higher 90-day dialysis dependence (Shawwa 2021)<br>
+                        \u2022 Time-limited trial approach: "We will continue for X more days and reassess"<br>
+                        \u2022 Daily readiness assessment remains essential \u2014 recovery can occur late
+                    </div>
+                </div>
+
+                <span class="evidence-toggle" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'">View evidence sources</span>
+                <div class="evidence-detail" style="margin-top:8px;">
+                    <strong>Discontinuation predictors:</strong> Raina 2025 Delphi consensus; Baeg 2021 & Jeon 2024 (validated 4-variable score, AUROC 0.73\u20130.75); Katulka 2020, Stads 2019 (systematic reviews); Hansrivijit 2020 (meta-analysis, UO AUC 0.80\u20130.89).<br><br>
+                    <strong>UO threshold:</strong> >400\u2013500 mL/24h without diuretics is the most robust single predictor across all studies. With diuretics, threshold needs \u22652 L/24h. Short timed CrCl >20\u201323 mL/min is a strong adjunct (Raina 2025; Schiffl 2018).<br><br>
+                    <strong>IHD transition:</strong> Q7.2 synthesis \u2014 any vasopressor at transition associated with 3.9\u00D7 IDH risk. Higher MAP on transition day = independent success predictor (aOR 1.02/mmHg). SLED/hybrid modalities as intermediate step (multiple cohorts).<br><br>
+                    <strong>Restart threshold:</strong> NorA >0.1 mcg/kg/min (Dr. CMY, Phase 2 consultation). Aligns with Q7.2 evidence: any vasopressor increases IDH risk.<br><br>
+                    <strong>Prolonged CRRT:</strong> Shawwa 2021 (>7 days associated with \u219190-day dialysis dependence); KDIGO + Katulka 2020: stop when no longer consistent with goals of care.
+                </div>
+            </div>
+        </div>`;
+        document.getElementById('discontinuationSection').innerHTML = discoHTML;
+    }
+
+    function showQuickMode() {
+        document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.mode-btn')[0].classList.add('active');
+    }
+
+    function showDetailedMode() {
+        document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.mode-btn')[1].classList.add('active');
+        alert('In v12, this would toggle to the current v11-style interface with full data entry fields \u2013 pre-populated with any Quick Mode selections.');
+    }
+
+    // Init
+    updateNavButtons();
+    updateCounts();
+
+    // Version stamp — visible in console
+    const REINA_VERSION = 'v12.5-ring3';
+    const REINA_BUILD = '2026-03-25';
+    console.log(`%c REINA ${REINA_VERSION} (${REINA_BUILD}) loaded successfully `, 'background: #0e7490; color: white; padding: 4px 8px; border-radius: 4px;');
+
+    // Global error handler
+    window.onerror = function(msg, url, line, col, error) {
+        console.error(`REINA error at line ${line}:${col}: ${msg}`);
+        return false;
+    };
+</script>
+
+</body>
+</html>
